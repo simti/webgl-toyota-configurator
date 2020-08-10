@@ -1,0 +1,25 @@
+{
+    "name": "es6",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "babel-core": "^6.26.3",
+        "babel-loader": "^8.1.0",
+        "babel-preset-env": "^1.7.0",
+        "jquery": "^3.4.1",
+        "three": "^0.119.1",
+        "uglifyjs-webpack-plugin": "^2.2.0",
+        "underscore": "^1.10.2",
+        "webpack": "^4.42.1"
+    },
+    "devDependencies": {
+        "webpack-cli": "^3.3.11"
+    }
+}
