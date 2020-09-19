@@ -19,7 +19,7 @@ import * as THREE from 'three';
 				// camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
         // camera.position.set( - 1.8, 0.6, 2.7 );
         
-        camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 2000);
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
         camera.position.set(400, 200, 0);
 
         scene = new THREE.Scene();
@@ -42,7 +42,7 @@ import * as THREE from 'three';
 						// use of RoughnessMipmapper is optional
 						var roughnessMipmapper = new RoughnessMipmapper( renderer );
 						var loader = new GLTFLoader().setPath( 'dist/' );
-						loader.load( 'mustang.gltf', function ( gltf ) {
+						loader.load( 'corolla_v_0017.glb', function ( gltf ) {
 							gltf.scene.traverse( function ( child ) {
                   if ( child.isMesh ) {
                     console.log(child)
