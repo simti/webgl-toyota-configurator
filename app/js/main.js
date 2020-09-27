@@ -3,10 +3,11 @@ import * as THREE from 'three';
 			import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
-			import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
+      import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
+      import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,spotLight,lightHelper,shadowCameraHelper;
+			var camera, scene, renderer,headlight,lightHelper,shadowCameraHelper;
 
 			init();
 			render();
@@ -14,83 +15,36 @@ import * as THREE from 'three';
 			function init() {
 
 				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				// camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-        // camera.position.set( - 1.8, 0.6, 2.7 );
+        document.body.appendChild( container );
         
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
+        // camera
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
         camera.position.set(400, 200, 0);
 
+        // scene
         scene = new THREE.Scene();
-
         scene.add( new THREE.AxesHelper(1000));
         
         //makes color brighter and stronger
         var light = new THREE.AmbientLight( 0x222222 );
         scene.add( light );
+
+        // spotlight
+        const color = 0xFFFFFF;
+        const intensity = 1;
+        headlight = new THREE.SpotLight(color, intensity);
+        headlight.position.set(0, 4, 40);
+        headlight.target.position.set(0, 0, 400);
+        scene.add(headlight);
+        scene.add(headlight.target);
+
+        const helper = new THREE.SpotLightHelper(headlight);
+        scene.add(helper);
         
 
-        // spotLight = new THREE.SpotLight( 0xffffff, 1 );
-        // spotLight.position.set( 0, 0, 0 );
-        // spotLight.target.position.x = 300;
-        // spotLight.target.position.y = 300;
-        // spotLight.target.position.z = 300;
-
-
-        // spotLight.angle = 0.5;
-        // spotLight.intensity = 2;
-				// spotLight.penumbra = 0.4;
-				// spotLight.decay = 2;
-				// spotLight.distance = 600;
-				// spotLight.castShadow = true;
-				// spotLight.shadow.mapSize.width = 1024;
-				// spotLight.shadow.mapSize.height = 1024;
-				// spotLight.shadow.camera.near = 100;
-        // spotLight.shadow.camera.far = 600;
-				// scene.add( spotLight );
-
-				// lightHelper = new THREE.SpotLightHelper( spotLight );
-        // scene.add( lightHelper );
-        
-        // shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-        // scene.add( shadowCameraHelper );
-        
-        spotLight = new THREE.SpotLight( 0xffffff, 10 );
-        spotLight.position.set( 0, 0, -1 );
-        
-				spotLight.angle = Math.PI / 4;
-				spotLight.penumbra = 0.05;
-				spotLight.decay = 2;
-        spotLight.distance = 1000;
-        spotLight.intensity = 2;
-				spotLight.castShadow = true;
-				spotLight.shadow.mapSize.width = 1024;
-				spotLight.shadow.mapSize.height = 1024;
-				spotLight.shadow.camera.near = 10;
-				spotLight.shadow.camera.far = 1000;
-        scene.add( spotLight );
-        // scene.add( spotLight.target );
-        // spotLight.target.position.x = 1;
-        // spotLight.target.position.y = 0;
-        // spotLight.target.position.z = 100;
-        
-        // var li = new THREE.PointLight( 0xff0000, 2 );
-        // li.decay = 2;
-        // li.distance = 20;
-        // li.position.set( 0, -230, 0 );
-        // scene.add( li );
-
-        lightHelper = new THREE.SpotLightHelper( spotLight );
-				// lightHelper = new THREE.PointLightHelper( li );
-				scene.add( lightHelper );
-
-				shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-        // scene.add( shadowCameraHelper );
-        
+        // ground
         var material = new THREE.MeshPhongMaterial( { color: 0x747474, dithering: true } );
-
-				var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				var geometry = new THREE.PlaneBufferGeometry( 4000, 4000 );
         var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, -180, 300 );
 				mesh.rotation.x = - Math.PI * 0.5;
@@ -98,6 +52,7 @@ import * as THREE from 'three';
 				scene.add( mesh );
 
 
+        // load hdri and car object
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'dist/env/' )
@@ -108,7 +63,6 @@ import * as THREE from 'three';
 						texture.dispose();
 						pmremGenerator.dispose();
 						render();
-						// use of RoughnessMipmapper is optional
 						var roughnessMipmapper = new RoughnessMipmapper( renderer );
 						var loader = new GLTFLoader().setPath( 'dist/' );
 						loader.load( 'corolla_v_0017.glb', function ( gltf ) {
@@ -116,8 +70,6 @@ import * as THREE from 'three';
                   if ( child.isMesh ) {
                     child.castShadow = true; 
                     child.receiveShadow = true;
-                    // console.log(child)
-                    // child.material.wireframe = true;
                     if(child.name == "Body"){
                         child.material.needsUpdate=true;
                         child.material.envMap=null;
@@ -164,17 +116,7 @@ import * as THREE from 'three';
           } 
         );
 
-
-
-
-        // var geometry = new THREE.PlaneGeometry( 500, 500, 300 );
-        // var material = new THREE.MeshPhongMaterial( { color: 0x474747, dithering: true ,side: THREE.DoubleSide} );
-        // var plane = new THREE.Mesh( geometry, material );
-        // plane.receiveShadow = true;
-        // plane.position.set(0,0, 600);
-        // scene.add( plane );
-
-
+        // renderer
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -183,17 +125,17 @@ import * as THREE from 'three';
         renderer.outputEncoding = THREE.sRGBEncoding;
         // renderer.shadowMap.enabled = true;
         container.appendChild( renderer.domElement );
-
         var pmremGenerator = new THREE.PMREMGenerator( renderer );
         pmremGenerator.compileEquirectangularShader();
 
+        // orbit controller
         controls = new OrbitControls( camera, renderer.domElement );
         controls.addEventListener( 'change', render ); // use if there is no animation loop
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
         controls.minDistance = 100;
-        controls.maxDistance = 1500;
+        controls.maxDistance = 2000;
         controls.maxPolarAngle = Math.PI/2 ;
         // controls.minDistance = 2;
         // controls.maxDistance = 10;
@@ -201,6 +143,23 @@ import * as THREE from 'three';
         controls.update();
         window.addEventListener( 'resize', onWindowResize, false );
 		  	}
+
+
+        // gui
+        const gui = new GUI({
+          height : 5 * 32 - 1
+        });
+        var params = {
+          intensity: 1
+      };
+        // gui.add(headlight, 'intensity', 0, 2, 0.01);
+        // gui.add(params, 'interation').min(128).max(256).step(16)
+        gui.add(params, 'intensity', 0, 40).onChange(updateLight);
+        // gui.add(headlight, 'penumbra', 0, 1, 0.01);
+        // makeXYZGUI(gui, headlight.position, 'position', updateLight);
+        // makeXYZGUI(gui, headlight.target.position, 'target', updateLight);
+
+
 
 			function onWindowResize() {
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -213,4 +172,19 @@ import * as THREE from 'three';
 
 			function render() {
 				renderer.render( scene, camera );
-			}
+      }
+      
+
+      function makeXYZGUI(gui, vector3, name, onChangeFn) {
+        const folder = gui.addFolder(name);
+        folder.add(vector3, 'x', -100, 100).onChange(onChangeFn);
+        folder.add(vector3, 'y', 0, 100).onChange(onChangeFn);
+        folder.add(vector3, 'z', -100, 100).onChange(onChangeFn);
+        folder.open();
+      }
+
+      function updateLight() {
+        headlight.target.updateMatrixWorld();
+        // helper.update();
+      }
+      
