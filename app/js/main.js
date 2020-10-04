@@ -4,10 +4,10 @@ import * as THREE from 'three';
 			import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
       import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
-      import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
+      // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,headlight,lightHelper,shadowCameraHelper;
+			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_;
 
 			init();
 			render();
@@ -23,33 +23,38 @@ import * as THREE from 'three';
 
         // scene
         scene = new THREE.Scene();
-        scene.add( new THREE.AxesHelper(1000));
+        // scene.add( new THREE.AxesHelper(1000));
         
         //makes color brighter and stronger
         var light = new THREE.AmbientLight( 0x222222 );
         scene.add( light );
 
-        // spotlight
-        const color = 0xFFFFFF;
-        const intensity = 1;
-        headlight = new THREE.SpotLight(color, intensity);
-        headlight.position.set(0, 4, 40);
-        headlight.target.position.set(0, 0, 400);
-        scene.add(headlight);
-        scene.add(headlight.target);
 
-        const helper = new THREE.SpotLightHelper(headlight);
-        scene.add(helper);
+        
+
         
 
         // ground
         var material = new THREE.MeshPhongMaterial( { color: 0x747474, dithering: true } );
-				var geometry = new THREE.PlaneBufferGeometry( 4000, 4000 );
+				var geometry = new THREE.PlaneBufferGeometry( 8000, 8000 );
         var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( 0, -180, 300 );
+				mesh.position.set( 0, -180, 900 );
 				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
-				scene.add( mesh );
+        scene.add( mesh );
+
+
+        // test target
+        var material2 = new THREE.MeshPhongMaterial( { color: 0x747474, dithering: true } );
+				var geometry2= new THREE.PlaneBufferGeometry( 8000, 8000 );
+        var mesh2 = new THREE.Mesh( geometry2, material2 );
+				mesh2.position.set( 0, -180, 900 );
+				mesh2.rotation.x = - Math.PI * 0.5;
+				mesh2.receiveShadow = true;
+        scene.add( mesh2 );
+        
+
+
 
 
         // load hdri and car object
@@ -98,6 +103,19 @@ import * as THREE from 'three';
                         child.material.reflectivity=1;
                         child.material.roughness=0;
                         child.material.transmission=0.9;
+
+                        // add glow
+                        // var spriteMaterial = new THREE.SpriteMaterial( 
+                        //   { 
+                        //     map: new THREE.ImageUtils.loadTexture( 'dist/textures/t.png' ), 
+                        //     useScreenCoordinates: false,
+                        //     color: 0xff0000, transparent: false, blending: THREE.AdditiveBlending
+                        //   });
+                        //   var sprite = new THREE.Sprite( spriteMaterial );
+                        //   sprite.opacity = 0;
+                        //   sprite.center.set( 0, 0 );
+                        //   sprite.scale.set(200, 200, 1.0);
+                        //   child.add(sprite)
                     }
 
                     if(child.name == "rahnama_borzorg"){
@@ -108,6 +126,41 @@ import * as THREE from 'three';
                   }
                 }
               );
+              // spotlight
+              const color = 0xFFFFFF;
+              const intensity = 1;
+              const angle = Math.PI/4;
+              const dist = 600;
+              const penumbra = 0.5;
+              //right headlight
+              headlight1 = new THREE.SpotLight(color, intensity);
+              headlight1.distance = dist;
+              headlight1.angle = angle;
+              headlight1.penumbra = penumbra;
+              headlight1.position.set(-100, 0, 550);
+              headlight1.target = mesh;
+              headlight1.target.position.x = -100;
+              gltf.scene.add(headlight1);
+              gltf.scene.add(headlight1.target);
+
+              //left headlight
+              headlight2 = new THREE.SpotLight(color, intensity);
+              headlight2.distance = dist;
+              headlight2.angle = angle;
+              headlight2.penumbra = penumbra;
+              headlight2.position.set(100, 0, 550);
+              headlight2.target = mesh2;
+              headlight2.target.position.x = 100;
+              // headlight2.target.position.set(0, 0, 400);
+              gltf.scene.add(headlight2);
+              gltf.scene.add(headlight2.target);
+              
+              gltf.scene.position.set(0,0,0);
+              // const helper1 = new THREE.SpotLightHelper(headlight1);
+              // const helper2 = new THREE.SpotLightHelper(headlight2);
+              // gltf.scene.add(helper1);
+              // gltf.scene.add(helper2);
+
               scene.add( gltf.scene );
               
 							roughnessMipmapper.dispose();
@@ -135,8 +188,8 @@ import * as THREE from 'three';
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
         controls.minDistance = 100;
-        controls.maxDistance = 2000;
-        controls.maxPolarAngle = Math.PI/2 ;
+        controls.maxDistance = 3000;
+        controls.maxPolarAngle = Math.PI/2;
         // controls.minDistance = 2;
         // controls.maxDistance = 10;
         // controls.target.set( 0, 0, - 0.2 );
@@ -146,18 +199,14 @@ import * as THREE from 'three';
 
 
         // gui
-        const gui = new GUI({
-          height : 5 * 32 - 1
-        });
-        var params = {
-          intensity: 1
-      };
-        // gui.add(headlight, 'intensity', 0, 2, 0.01);
-        // gui.add(params, 'interation').min(128).max(256).step(16)
-        gui.add(params, 'intensity', 0, 40).onChange(updateLight);
-        // gui.add(headlight, 'penumbra', 0, 1, 0.01);
-        // makeXYZGUI(gui, headlight.position, 'position', updateLight);
-        // makeXYZGUI(gui, headlight.target.position, 'target', updateLight);
+        // const gui = new GUI({
+        //   height : 5 * 32 - 1
+        // });
+        // var params = {
+        //   intensity: 1
+        // };
+        // gui.add(params, 'intensity', 0, 40).onChange(updateLight);
+        
 
 
 
@@ -184,7 +233,8 @@ import * as THREE from 'three';
       }
 
       function updateLight() {
-        headlight.target.updateMatrixWorld();
+        headlight1.target.updateMatrixWorld();
+        headlight2.target.updateMatrixWorld();
         // helper.update();
       }
       
