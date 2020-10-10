@@ -4,21 +4,28 @@ import * as THREE from 'three';
 			import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
       import { RoughnessMipmapper } from 'three/examples/jsm/utils/RoughnessMipmapper.js';
+      import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+      import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+      import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_;
+			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer;
 
 			init();
-			render();
+      // render();
+      animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				// container = document.createElement( 'div' );
+        // document.body.appendChild( container );
+
+        container = document.getElementById( 'canvas' );
         document.body.appendChild( container );
         
         // camera
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+        camera = new THREE.PerspectiveCamera(60, container.offsetWidth / container.offsetHeight, 1, 4000);
         camera.position.set(400, 200, 0);
 
         // scene
@@ -172,7 +179,7 @@ import * as THREE from 'three';
         // renderer
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( container.offsetWidth,container.offsetHeight  );
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1;
         renderer.outputEncoding = THREE.sRGBEncoding;
@@ -180,6 +187,16 @@ import * as THREE from 'three';
         container.appendChild( renderer.domElement );
         var pmremGenerator = new THREE.PMREMGenerator( renderer );
         pmremGenerator.compileEquirectangularShader();
+
+
+
+        //post processing
+        composer = new EffectComposer( renderer );
+        renderPass = new RenderPass( scene, camera );
+        composer.addPass( renderPass );
+
+        glitchPass = new GlitchPass();
+        composer.addPass( glitchPass );
 
         // orbit controller
         controls = new OrbitControls( camera, renderer.domElement );
@@ -211,9 +228,9 @@ import * as THREE from 'three';
 
 
 			function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.aspect = container.offsetWidth / container.offsetHeight;
 				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize(container.offsetWidth, container.offsetHeight );
 				render();
 			}
 
@@ -236,5 +253,14 @@ import * as THREE from 'three';
         headlight1.target.updateMatrixWorld();
         headlight2.target.updateMatrixWorld();
         // helper.update();
+      }
+
+
+      function animate() {
+
+        requestAnimationFrame( animate );
+      
+        composer.render();
+      
       }
       
