@@ -10,11 +10,11 @@ import * as THREE from 'three';
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer;
+			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,vector,meshs,sprite;
 
 			init();
-      // render();
-      animate();
+      render();
+      // animate();
 
 			function init() {
 
@@ -36,7 +36,26 @@ import * as THREE from 'three';
         var light = new THREE.AmbientLight( 0x222222 );
         scene.add( light );
 
+        var ma = new THREE.MeshPhongMaterial( { 
+          color: 0x000000, 
+          dithering: true ,
+          side: THREE.FrontSide,
+          map: new THREE.ImageUtils.loadTexture( 'dist/textures/tt.jpg' ), 
+          useScreenCoordinates: false,
+          color: 0xffffff, 
+          transparent: false, 
+          blending: THREE.AdditiveBlending
+        } );
 
+        var ge = new THREE.PlaneBufferGeometry( 200, 200 );
+        meshs = new THREE.Mesh( ge, ma );
+        meshs.lookAt(camera.position)
+        scene.add( meshs );
+        meshs.opacity = 0;
+        // meshs.lookAt(camera.position);
+
+
+        
         
 
         
@@ -111,18 +130,13 @@ import * as THREE from 'three';
                         child.material.roughness=0;
                         child.material.transmission=0.9;
 
+                        // ------------------------
+                          
+                        // ------------------------
+
                         // add glow
-                        // var spriteMaterial = new THREE.SpriteMaterial( 
-                        //   { 
-                        //     map: new THREE.ImageUtils.loadTexture( 'dist/textures/t.png' ), 
-                        //     useScreenCoordinates: false,
-                        //     color: 0xff0000, transparent: false, blending: THREE.AdditiveBlending
-                        //   });
-                        //   var sprite = new THREE.Sprite( spriteMaterial );
-                        //   sprite.opacity = 0;
-                        //   sprite.center.set( 0, 0 );
-                        //   sprite.scale.set(200, 200, 1.0);
-                        //   child.add(sprite)
+                        
+                        // child.add(meshs)
                     }
 
                     if(child.name == "rahnama_borzorg"){
@@ -168,7 +182,7 @@ import * as THREE from 'three';
               // gltf.scene.add(helper1);
               // gltf.scene.add(helper2);
 
-              scene.add( gltf.scene );
+              // scene.add( gltf.scene );
               
 							roughnessMipmapper.dispose();
 							render();
@@ -191,12 +205,12 @@ import * as THREE from 'three';
 
 
         //post processing
-        composer = new EffectComposer( renderer );
-        renderPass = new RenderPass( scene, camera );
-        composer.addPass( renderPass );
+        // composer = new EffectComposer( renderer );
+        // renderPass = new RenderPass( scene, camera );
+        // composer.addPass( renderPass );
 
-        glitchPass = new GlitchPass();
-        composer.addPass( glitchPass );
+        // glitchPass = new GlitchPass();
+        // composer.addPass( glitchPass );
 
         // orbit controller
         controls = new OrbitControls( camera, renderer.domElement );
@@ -237,7 +251,11 @@ import * as THREE from 'three';
 			//
 
 			function render() {
-				renderer.render( scene, camera );
+        renderer.render( scene, camera );
+        // meshs.lookAt(camera.position);
+        vector = camera.getWorldDirection();
+        theta = Math.atan2(vector.x,vector.z);
+        console.log(Math.floor(THREE.Math.radToDeg(theta)))
       }
       
 
@@ -256,11 +274,12 @@ import * as THREE from 'three';
       }
 
 
-      function animate() {
+      // function animate() {
 
-        requestAnimationFrame( animate );
+      //   requestAnimationFrame( animate );
       
-        composer.render();
+      //   // composer.render();
+      //   renderer.render();
       
-      }
+      // }
       
