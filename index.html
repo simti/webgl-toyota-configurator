@@ -7,102 +7,79 @@
     <title>My Modular APP</title>
 
 </head>
-<!-- <style>
-    body {
-        margin: 0;
-        background-color: #000;
-        color: #fff;
-        font-family: Monospace;
-        font-size: 13px;
-        line-height: 24px;
-        overscroll-behavior: none;
-    }
-    
-    a {
-        color: #ff0;
-        text-decoration: none;
-    }
-    
-    a:hover {
-        text-decoration: underline;
-    }
-    
-    button {
-        cursor: pointer;
-        text-transform: uppercase;
-    }
-    
-    canvas {
-        display: block;
-    }
-    
-    #info {
-        position: absolute;
-        top: 0px;
-        width: 100%;
-        padding: 10px;
-        box-sizing: border-box;
-        text-align: center;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        pointer-events: none;
-        z-index: 1;
-        /* TODO Solve this in HTML */
-    }
-    
-    a,
-    button,
-    input,
-    select {
-        pointer-events: auto;
-    }
-    
-    .dg.ac {
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        z-index: 2 !important;
-        /* TODO Solve this in HTML */
-    }
-    
-    #overlay {
-        position: absolute;
-        z-index: 2;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.7);
-    }
-    
-    #overlay button {
-        background: #ffffff;
-        border: 0;
-        color: #000000;
-        padding: 16px 20px;
-        text-transform: uppercase;
-        cursor: pointer;
-    }
-    
-    #notSupported {
-        width: 50%;
-        margin: auto;
-        background-color: #f00;
-        margin-top: 20px;
-        padding: 10px;
-    }
-</style> -->
 <style>
     html,
     body {
         margin: 0;
         padding: 0;
+    }
+
+    .gui__header{
+        height: 48px;
+        background-color: rgb(37, 37, 37);
+        color: white;
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        padding: 0px 10px;
+        display: flex;
+        flex-direction: row;
+        border-radius: 50px;
+        box-shadow: rgba(0, 0, 0, 0.26) 2px 2px 15px 0px;
+        transition: width 250ms ease-in-out 0s;
+    }
+
+    .item-seperator::after {
+        content: '';
+        background: #9a9a9a;
+        position: absolute;
+        top: 11px;
+        bottom: 11px;
+        width: 1px;
+    }
+
+    .item-seperator {
+        position: relative;
+    }
+
+    .gui__header--item{
+        margin: 0px;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        font-family: forsmartdigiRegular;
+        padding: 0px;
+        top: 50%;
+        right: 0px;
+        transition: all 250ms ease-in-out 0s;
+        opacity: 1;
+        pointer-events: inherit;
+        position: relative;
+        transform: translate3d(0px, -50%, 0px);
+    }
+
+    .gui__header--item svg{
+        top: 50%;
+        left: 50%;
+        transform-origin: left top;
+        transform: scale(1) translate3d(-50%, -50%, 0px);
+        transition: transform 250ms ease-in-out 0s;
+        animation-name: ljZuES;
+        animation-duration: 0.25s;
+        animation-delay: 0s;
+        animation-fill-mode: both;
+        animation-timing-function: cubic-bezier(0.34, 0.12, 0.36, 1);
+        fill: rgb(255, 255, 255);
+        position: absolute;
+    }
+
+    .gui__footer{
+        position: absolute;
+        height: 150px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: red;
     }
     
     #canvas {
@@ -117,7 +94,33 @@
     <div id="canvas"></div>
 </body>
 <script src="dist/bundle.js" type="text/javascript"></script>
-<div class="gui__header"></div>
+<div class="gui__header">
+    <div class="gui__header--item">
+        <svg title="Drive" width="32" height="32" viewBox="0 0 32 32">
+            <path d="M18.22 16A2.22 2.22 0 1 0 16 18.22 2.23 2.23 0 0 0 18.22 16zM16 17.22A1.22 1.22 0 1 1 17.22 16 1.22 1.22 0 0 1 16 17.22z"></path>
+            <path d="M16 7a9 9 0 1 0 9 9 9 9 0 0 0-9-9zm0 17a8 8 0 0 1-7.71-6h2.86a1.93 1.93 0 0 1 1.1.34c.82.58 2.16 2 1.94 4.91a.49.49 0 0 0 .46.53.5.5 0 0 0 .5-.46c.25-3.42-1.37-5.1-2.36-5.79a2.87 2.87 0 0 0-1.64-.53H8.1a8.26 8.26 0 0 1-.1-1 8 8 0 0 1 16 0 8.26 8.26 0 0 1-.07 1h-2.84a3.12 3.12 0 0 0-1.84.58c-1 .7-2.53 2.38-2.28 5.74a.5.5 0 0 0 .5.46.5.5 0 0 0 .46-.53c-.21-2.74.91-4.16 1.87-4.86a2.07 2.07 0 0 1 1.29-.39h2.62A8 8 0 0 1 16 24z"></path>
+            <path d="M16 3.85A12.15 12.15 0 1 0 28.15 16 12.16 12.16 0 0 0 16 3.85zm0 23.3A11.15 11.15 0 1 1 27.15 16 11.16 11.16 0 0 1 16 27.15z"></path>
+            <path d="M22.39 14.23a.51.51 0 0 0 .17 0 .51.51 0 0 0 .17-1c-5.92-2.07-13.25-.23-13.56-.16a.5.5 0 0 0-.36.61.49.49 0 0 0 .6.36c.08-.04 7.35-1.83 12.98.19z"></path>
+        </svg>
+    </div>
+    <div class="item-seperator"></div>
+    <div class="gui__header--item">
+        <svg title="Day mode" width="32" height="32" viewBox="0 0 32 32">
+            <path d="M16 10.89A5.11 5.11 0 1 0 21.11 16 5.11 5.11 0 0 0 16 10.89zm0 9.22A4.11 4.11 0 1 1 20.11 16 4.11 4.11 0 0 1 16 20.11zM15.5 4.28h1v5.14h-1z"></path>
+            <path transform="rotate(-30 11.434 8.084)" d="M10.92 5.51h1v5.14h-1z"></path>
+            <path transform="rotate(-60 8.077 11.43)" d="M7.58 8.86h1V14h-1z"></path>
+            <path d="M4.28 15.5h5.14v1H4.28z"></path>
+            <path transform="rotate(-30 8.084 20.586)" d="M5.51 20.07h5.14v1H5.51z"></path>
+            <path transform="rotate(-60.01 11.423 23.926)" d="M8.86 23.42H14v1H8.86z"></path>
+            <path d="M15.5 22.58h1v5.14h-1z"></path>
+            <path transform="rotate(-30 20.568 23.931)" d="M20.07 21.36h1v5.14h-1z"></path>
+            <path transform="rotate(-60 23.925 20.58)" d="M23.42 18.01h1v5.14h-1z"></path>
+            <path d="M22.58 15.5h5.14v1h-5.14z"></path>
+            <path transform="rotate(-30 23.918 11.429)" d="M21.36 10.92h5.14v1h-5.14z"></path>
+            <path transform="rotate(-60.01 20.578 8.073)" d="M18.01 7.58h5.14v1h-5.14z"></path>
+        </svg>
+    </div>
+</div>
 <div class="gui__sidebar"></div>
 <div class="gui__footer"></div>
 </html>
