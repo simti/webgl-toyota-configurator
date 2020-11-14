@@ -25,8 +25,9 @@ import * as THREE from 'three';
         document.body.appendChild( container );
         
         // camera
-        camera = new THREE.PerspectiveCamera(60, container.offsetWidth / container.offsetHeight, 1, 4000);
-        camera.position.set(400, 200, 0);
+        // container.offsetWidth,container.offsetHeight
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+        camera.position.set(400, 200, 300);
 
         // scene
         scene = new THREE.Scene();
@@ -58,11 +59,11 @@ import * as THREE from 'three';
         });
 
         // Mesh
-        const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
-        shadowMesh.position.y = - 170;
-        shadowMesh.position.z = 50;
-        shadowMesh.rotation.y = Math.PI / 2;
-        scene.add(shadowMesh)
+        // const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
+        // shadowMesh.position.y = - 170;
+        // shadowMesh.position.z = 50;
+        // shadowMesh.rotation.y = Math.PI / 2;
+        // scene.add(shadowMesh)
 
 
         // ground
@@ -94,7 +95,7 @@ import * as THREE from 'three';
         
 
         
-        floorTexture = new THREE.ImageUtils.loadTexture( 'dist/textures/floor.jpg' );
+        floorTexture = new THREE.ImageUtils.loadTexture( 'dist/textures/asphalt.jpg' );
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
         floorTexture.repeat.set( 9, 9 );
 
@@ -224,7 +225,6 @@ import * as THREE from 'three';
               // const helper2 = new THREE.SpotLightHelper(headlight2);
               // gltf.scene.add(helper1);
               // gltf.scene.add(helper2);
-
               scene.add( gltf.scene );
               
 							roughnessMipmapper.dispose();
@@ -236,7 +236,7 @@ import * as THREE from 'three';
         // renderer
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( container.offsetWidth,container.offsetHeight  );
+        renderer.setSize( window.innerWidth,window.innerHeight  );
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1;
         renderer.outputEncoding = THREE.sRGBEncoding;
@@ -261,7 +261,7 @@ import * as THREE from 'three';
         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
-        controls.minDistance = 100;
+        controls.minDistance = 1000;
         controls.maxDistance = 3000;
         controls.maxPolarAngle = Math.PI/2;
         // controls.minDistance = 2;
@@ -285,9 +285,9 @@ import * as THREE from 'three';
 
 
 			function onWindowResize() {
-				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-				renderer.setSize(container.offsetWidth, container.offsetHeight );
+				renderer.setSize(window.innerWidth, window.innerHeight );
 				render();
 			}
 
