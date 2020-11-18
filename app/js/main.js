@@ -230,9 +230,7 @@ import * as THREE from 'three';
 							roughnessMipmapper.dispose();
 							render();
             },function(xhr) {
-
               console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-          
             } );
           } 
         );
