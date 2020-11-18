@@ -7,10 +7,11 @@ import * as THREE from 'three';
       import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
       import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
       import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+      import { Reflector } from 'three/examples/jsm/objects/Reflector'
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,vector,meshs,sprite,floorTexture;
+			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,vector,meshs,sprite,floorTexture,tttt;
 
 			init();
       render();
@@ -68,7 +69,7 @@ import * as THREE from 'three';
 
         // ground
 
-        var ma = new THREE.MeshPhongMaterial( { 
+        var ma = new THREE.MeshBasicMaterial( { 
           color: 0x000000, 
           dithering: true ,
           side: THREE.FrontSide,
@@ -90,6 +91,8 @@ import * as THREE from 'three';
         meshs.opacity = 0;
         // meshs.lookAt(camera.position);
 
+        
+
 
         
         
@@ -106,7 +109,20 @@ import * as THREE from 'three';
 				mesh.position.set( 0, -180, 900 );
 				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
-        scene.add( mesh );
+        // scene.add( mesh );
+
+        // tttt = new THREE.PlaneBufferGeometry( 8000, 8000 );
+				// const groundMirror = new Reflector( tttt, {
+				// 	clipBias: 0.003,
+				// 	textureWidth: window.innerWidth * window.devicePixelRatio,
+				// 	textureHeight: window.innerHeight * window.devicePixelRatio,
+        //   color: 0x777777,
+        //   opacity:0,
+        //   transparent:true
+				// } );
+				// groundMirror.position.set( 0, -110, 900 );
+				// groundMirror.rotateX( - Math.PI / 2 );
+				// scene.add( groundMirror );
 
 
         // test target
@@ -116,7 +132,7 @@ import * as THREE from 'three';
 				mesh2.position.set( 0, -180, 900 );
 				mesh2.rotation.x = - Math.PI * 0.5;
 				mesh2.receiveShadow = true;
-        scene.add( mesh2 );
+        // scene.add( mesh2 );
         
 
 

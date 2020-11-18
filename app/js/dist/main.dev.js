@@ -18,15 +18,16 @@ var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass.js");
 
 var _GlitchPass = require("three/examples/jsm/postprocessing/GlitchPass.js");
 
+var _Reflector = require("three/examples/jsm/objects/Reflector");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-// import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 var container, controls;
-var camera, scene, renderer, headlight1, headlight2, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, vector, meshs, sprite, floorTexture;
+var camera, scene, renderer, headlight1, headlight2, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, vector, meshs, sprite, floorTexture, tttt;
 init();
 render(); // animate();
 
@@ -67,7 +68,7 @@ function init() {
   // scene.add(shadowMesh)
   // ground
 
-  var ma = new THREE.MeshPhongMaterial((_ref = {
+  var ma = new THREE.MeshBasicMaterial((_ref = {
     color: 0x000000,
     dithering: true,
     side: THREE.FrontSide,
@@ -101,8 +102,20 @@ function init() {
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, -180, 900);
   mesh.rotation.x = -Math.PI * 0.5;
-  mesh.receiveShadow = true;
-  scene.add(mesh); // test target
+  mesh.receiveShadow = true; // scene.add( mesh );
+  // tttt = new THREE.PlaneBufferGeometry( 8000, 8000 );
+  // const groundMirror = new Reflector( tttt, {
+  // 	clipBias: 0.003,
+  // 	textureWidth: window.innerWidth * window.devicePixelRatio,
+  // 	textureHeight: window.innerHeight * window.devicePixelRatio,
+  //   color: 0x777777,
+  //   opacity:0,
+  //   transparent:true
+  // } );
+  // groundMirror.position.set( 0, -110, 900 );
+  // groundMirror.rotateX( - Math.PI / 2 );
+  // scene.add( groundMirror );
+  // test target
 
   var material2 = new THREE.MeshPhongMaterial({
     color: 0xffffff,
@@ -113,8 +126,8 @@ function init() {
   var mesh2 = new THREE.Mesh(geometry2, material2);
   mesh2.position.set(0, -180, 900);
   mesh2.rotation.x = -Math.PI * 0.5;
-  mesh2.receiveShadow = true;
-  scene.add(mesh2); // load hdri and car object
+  mesh2.receiveShadow = true; // scene.add( mesh2 );
+  // load hdri and car object
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('studio.hdr', function (texture) {
     var envMap = pmremGenerator.fromEquirectangular(texture).texture;
