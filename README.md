@@ -1,4 +1,6 @@
-# Toyota Corolla 2020 conficurator
+# Toyota Corolla 2020 conficurator(still in progress)
+
+[demo](https://simti.github.io/webgl-toyota-configurator/)
 
 1) clone the repository
 
