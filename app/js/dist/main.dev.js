@@ -164,8 +164,7 @@ function init() {
             meshs.position.z = 30;
             meshs.position.x = 20;
             meshs.lookAt(camera.position);
-            child.add(meshs);
-            console.log(child);
+            child.add(meshs); // console.log(child)
           }
 
           if (child.name == "rahnama_borzorg") {
@@ -209,6 +208,8 @@ function init() {
       scene.add(gltf.scene);
       roughnessMipmapper.dispose();
       render();
+    }, function (xhr) {
+      console.log(xhr.loaded / xhr.total * 100 + '% loaded');
     });
   }); // renderer
 

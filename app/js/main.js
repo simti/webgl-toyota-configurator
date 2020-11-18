@@ -180,7 +180,7 @@ import * as THREE from 'three';
                         meshs.lookAt(camera.position)
                         child.add(meshs)
 
-                        console.log(child)
+                        // console.log(child)
                     }
 
                     if(child.name == "rahnama_borzorg"){
@@ -229,7 +229,11 @@ import * as THREE from 'three';
               
 							roughnessMipmapper.dispose();
 							render();
-						} );
+            },function(xhr) {
+
+              console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          
+            } );
           } 
         );
 

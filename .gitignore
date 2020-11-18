@@ -3,5 +3,6 @@ build
 npm-debug.log
 .env
 .DS_Store
-app/js/dist/main.dev.js
+app/js/dist
 dist/bundle.js
+
