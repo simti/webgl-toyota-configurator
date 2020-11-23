@@ -1,4 +1,4 @@
-# Toyota Corolla 2020 conficurator(still in progress)
+# Toyota Corolla 2020 configurator(still in progress)
 
 [demo](https://simti.github.io/webgl-toyota-configurator/)
 
