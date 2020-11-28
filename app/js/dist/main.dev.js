@@ -27,7 +27,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var container, controls;
-var camera, scene, renderer, headlight1, headlight2, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, vector, meshs, sprite, floorTexture, tttt;
+var camera, scene, renderer, headlight1, headlight2, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, vector, meshs, sprite, floorTexture, tttt, xxxx;
 init();
 render(); // animate();
 
@@ -72,31 +72,34 @@ function init() {
     color: 0x000000,
     dithering: true,
     side: THREE.FrontSide,
-    map: new THREE.ImageUtils.loadTexture('dist/textures/lens.png'),
+    map: new THREE.ImageUtils.loadTexture('dist/textures/111.png'),
     useScreenCoordinates: false
   }, _defineProperty(_ref, "color", 0xffffff), _defineProperty(_ref, "transparent", true), _defineProperty(_ref, "blending", THREE.AdditiveBlending), _ref));
   var ge = new THREE.PlaneBufferGeometry(200, 200);
   meshs = new THREE.Mesh(ge, ma);
-  meshs.scale.set(0.6, 0.6);
+  meshs.scale.set(0.8, 0.8);
   meshs.renderOrder = 999;
 
   meshs.onBeforeRender = function (renderer) {
     renderer.clearDepth();
-  }; // meshs.position.y = 300;
+  }; // meshs.lookAt(camera.position)
+  // scene.add( meshs );
 
 
-  meshs.lookAt(camera.position); // scene.add( meshs );
-
-  meshs.opacity = 0; // meshs.lookAt(camera.position);
-
-  floorTexture = new THREE.ImageUtils.loadTexture('dist/textures/asphalt.jpg');
+  meshs.opacity = 0;
+  meshs.lookAt(camera.position);
+  floorTexture = new THREE.ImageUtils.loadTexture('dist/textures/D_Asphalt_02_NOrmal.jpg');
   floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set(9, 9); // ground
+  floorTexture.repeat.set(12, 12);
+  xxxx = new THREE.ImageUtils.loadTexture('dist/textures/D_Asphalt_02_DIFF.jpg');
+  xxxx.wrapS = xxxx.wrapT = THREE.RepeatWrapping;
+  xxxx.repeat.set(12, 12); // ground
 
   var material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     dithering: true,
-    map: floorTexture
+    normalMap: floorTexture,
+    map: xxxx
   });
   var geometry = new THREE.PlaneBufferGeometry(8000, 8000);
   var mesh = new THREE.Mesh(geometry, material);
@@ -120,7 +123,8 @@ function init() {
   var material2 = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     dithering: true,
-    map: floorTexture
+    normalMap: floorTexture,
+    map: xxxx
   });
   var geometry2 = new THREE.PlaneBufferGeometry(8000, 8000);
   var mesh2 = new THREE.Mesh(geometry2, material2);
@@ -149,8 +153,9 @@ function init() {
             child.material.envMap = null;
             child.material.metalness = 0.4061918556690216;
             child.material.reflectivity = 0.5;
-            child.material.roughness = 0.0278855562210083;
+            child.material.roughness = 0.1078855562210083;
             child.material.side = 2;
+            console.log(child);
           }
 
           if (child.name == "Shishe_jelo") {// child.material.needsUpdate=true;
@@ -174,8 +179,9 @@ function init() {
             // add glow
             // child.add( meshs );
 
-            meshs.position.z = 30;
-            meshs.position.x = 20;
+            meshs.position.z = 40;
+            meshs.position.x = 30;
+            meshs.position.y = 5;
             meshs.lookAt(camera.position);
             child.add(meshs); // console.log(child)
           }

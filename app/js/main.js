@@ -11,7 +11,7 @@ import * as THREE from 'three';
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,vector,meshs,sprite,floorTexture,tttt;
+			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,vector,meshs,sprite,floorTexture,tttt,xxxx;
 
 			init();
       render();
@@ -73,7 +73,7 @@ import * as THREE from 'three';
           color: 0x000000, 
           dithering: true ,
           side: THREE.FrontSide,
-          map: new THREE.ImageUtils.loadTexture( 'dist/textures/lens.png' ), 
+          map: new THREE.ImageUtils.loadTexture( 'dist/textures/111.png' ), 
           useScreenCoordinates: false,
           color: 0xffffff, 
           transparent: true, 
@@ -82,14 +82,13 @@ import * as THREE from 'three';
 
         var ge = new THREE.PlaneBufferGeometry( 200, 200 );
         meshs = new THREE.Mesh( ge, ma );
-        meshs.scale.set(0.6,0.6);
+        meshs.scale.set(0.8,0.8);
         meshs.renderOrder = 999;
         meshs.onBeforeRender = function( renderer ) { renderer.clearDepth(); };
-        // meshs.position.y = 300;
-        meshs.lookAt(camera.position)
+        // meshs.lookAt(camera.position)
         // scene.add( meshs );
         meshs.opacity = 0;
-        // meshs.lookAt(camera.position);
+        meshs.lookAt(camera.position);
 
         
 
@@ -98,12 +97,17 @@ import * as THREE from 'three';
         
 
         
-        floorTexture = new THREE.ImageUtils.loadTexture( 'dist/textures/asphalt.jpg' );
+        floorTexture = new THREE.ImageUtils.loadTexture( 'dist/textures/D_Asphalt_02_NOrmal.jpg' );
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-        floorTexture.repeat.set( 9, 9 );
+        floorTexture.repeat.set( 12, 12 );
+
+        
+        xxxx = new THREE.ImageUtils.loadTexture( 'dist/textures/D_Asphalt_02_DIFF.jpg' );
+        xxxx.wrapS = xxxx.wrapT = THREE.RepeatWrapping; 
+        xxxx.repeat.set( 12, 12 );
 
         // ground
-        var material = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true ,map: floorTexture  } );
+        var material = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true ,normalMap: floorTexture ,map:xxxx } );
 				var geometry = new THREE.PlaneBufferGeometry( 8000, 8000 );
         var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, -180, 900 );
@@ -126,7 +130,7 @@ import * as THREE from 'three';
 
 
         // test target
-        var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true,map: floorTexture  } );
+        var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true,normalMap: floorTexture,map:xxxx  } );
 				var geometry2= new THREE.PlaneBufferGeometry( 8000, 8000 );
         var mesh2 = new THREE.Mesh( geometry2, material2 );
 				mesh2.position.set( 0, -180, 900 );
@@ -161,9 +165,9 @@ import * as THREE from 'three';
                         child.material.envMap=null;
                         child.material.metalness=0.4061918556690216;
                         child.material.reflectivity=0.5;
-                        child.material.roughness=0.0278855562210083;
+                        child.material.roughness=0.1078855562210083;
                         child.material.side=2;  
-
+                      console.log(child)
                     }
 
                     if(child.name == "Shishe_jelo"){
@@ -191,8 +195,9 @@ import * as THREE from 'three';
 
                         // add glow
                         // child.add( meshs );
-                        meshs.position.z = 30;
-                        meshs.position.x = 20;
+                        meshs.position.z =40;
+                        meshs.position.x =30;
+                        meshs.position.y =5;
                         meshs.lookAt(camera.position)
                         child.add(meshs)
 
