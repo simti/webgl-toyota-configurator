@@ -72,12 +72,12 @@ function init() {
     color: 0x000000,
     dithering: true,
     side: THREE.FrontSide,
-    map: new THREE.ImageUtils.loadTexture('dist/textures/111.png'),
+    map: new THREE.ImageUtils.loadTexture('dist/textures/222.png'),
     useScreenCoordinates: false
   }, _defineProperty(_ref, "color", 0xffffff), _defineProperty(_ref, "transparent", true), _defineProperty(_ref, "blending", THREE.AdditiveBlending), _ref));
   var ge = new THREE.PlaneBufferGeometry(200, 200);
-  meshs = new THREE.Mesh(ge, ma);
-  meshs.scale.set(0.8, 0.8);
+  meshs = new THREE.Mesh(ge, ma); // meshs.scale.set(0.8,0.8);
+
   meshs.renderOrder = 999;
 
   meshs.onBeforeRender = function (renderer) {
@@ -124,7 +124,8 @@ function init() {
     color: 0xffffff,
     dithering: true,
     normalMap: floorTexture,
-    map: xxxx
+    map: xxxx,
+    specularMap: specular
   });
   var geometry2 = new THREE.PlaneBufferGeometry(8000, 8000);
   var mesh2 = new THREE.Mesh(geometry2, material2);
@@ -152,8 +153,8 @@ function init() {
             child.material.needsUpdate = true;
             child.material.envMap = null;
             child.material.metalness = 0.4061918556690216;
-            child.material.reflectivity = 0.5;
-            child.material.roughness = 0.1078855562210083;
+            child.material.reflectivity = 0.3;
+            child.material.roughness = 0.1878855562210083;
             child.material.side = 2;
             console.log(child);
           }
