@@ -72,11 +72,11 @@ function init() {
     color: 0x000000,
     dithering: true,
     side: THREE.FrontSide,
-    map: new THREE.ImageUtils.loadTexture('dist/textures/222.png'),
+    map: new THREE.ImageUtils.loadTexture('dist/textures/123.png'),
     useScreenCoordinates: false
   }, _defineProperty(_ref, "color", 0xffffff), _defineProperty(_ref, "transparent", true), _defineProperty(_ref, "blending", THREE.AdditiveBlending), _ref));
-  var ge = new THREE.PlaneBufferGeometry(200, 200);
-  meshs = new THREE.Mesh(ge, ma); // meshs.scale.set(0.8,0.8);
+  var ge = new THREE.PlaneBufferGeometry(180, 150);
+  meshs = new THREE.Mesh(ge, ma); // meshs.scale.set(0.6,0.6);
 
   meshs.renderOrder = 999;
 
@@ -124,8 +124,7 @@ function init() {
     color: 0xffffff,
     dithering: true,
     normalMap: floorTexture,
-    map: xxxx,
-    specularMap: specular
+    map: xxxx
   });
   var geometry2 = new THREE.PlaneBufferGeometry(8000, 8000);
   var mesh2 = new THREE.Mesh(geometry2, material2);
@@ -146,6 +145,7 @@ function init() {
     loader.load('corolla_v_0017.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
         if (child.isMesh) {
+          console.log(child);
           child.castShadow = true;
           child.receiveShadow = true;
 
@@ -180,8 +180,8 @@ function init() {
             // add glow
             // child.add( meshs );
 
-            meshs.position.z = 40;
-            meshs.position.x = 30;
+            meshs.position.z = 50;
+            meshs.position.x = 15;
             meshs.position.y = 5;
             meshs.lookAt(camera.position);
             child.add(meshs); // console.log(child)
