@@ -103,7 +103,7 @@ function init() {
   });
   var geometry = new THREE.PlaneBufferGeometry(8000, 8000);
   var mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(0, -180, 900);
+  mesh.position.set(0, 0, 900);
   mesh.rotation.x = -Math.PI * 0.5;
   mesh.receiveShadow = true; // scene.add( mesh );
   // tttt = new THREE.PlaneBufferGeometry( 8000, 8000 );
@@ -128,48 +128,48 @@ function init() {
   });
   var geometry2 = new THREE.PlaneBufferGeometry(8000, 8000);
   var mesh2 = new THREE.Mesh(geometry2, material2);
-  mesh2.position.set(0, -180, 900);
+  mesh2.position.set(0, 0, 900);
   mesh2.rotation.x = -Math.PI * 0.5;
   mesh2.receiveShadow = true; // scene.add( mesh2 );
   // load hdri and car object
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('studio.hdr', function (texture) {
-    var envMap = pmremGenerator.fromEquirectangular(texture).texture;
-    scene.background = envMap;
+    var envMap = pmremGenerator.fromEquirectangular(texture).texture; // scene.background = envMap;
+
+    scene.background = pmremGenerator.renderTarget;
     scene.environment = envMap;
     texture.dispose();
     pmremGenerator.dispose();
     render();
     var roughnessMipmapper = new _RoughnessMipmapper.RoughnessMipmapper(renderer);
     var loader = new _GLTFLoader.GLTFLoader().setPath('dist/');
-    loader.load('corolla_v_0017.glb', function (gltf) {
+    loader.load('final.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
         if (child.isMesh) {
           console.log(child);
           child.castShadow = true;
           child.receiveShadow = true;
 
-          if (child.name == "Body") {
+          if (child.name == "badane_mashin") {
             child.material.needsUpdate = true;
             child.material.envMap = null;
             child.material.metalness = 0.4061918556690216;
             child.material.reflectivity = 0.3;
             child.material.roughness = 0.1878855562210083;
             child.material.side = 2;
-            console.log(child);
           }
 
-          if (child.name == "Shishe_jelo") {// child.material.needsUpdate=true;
-            // child.material.envMap=null;
-            // child.material.metalness=0;
-            // child.material.reflectivity=0.5;
-            // child.material.roughness=0;
-            // child.material.side=2;  
-            // child.material.color=new THREE.Color("rgb(0,0, 0)");
+          if (child.name == "Shishe_jelo") {
+            child.material.needsUpdate = true;
+            child.material.envMap = null;
+            child.material.metalness = 0;
+            child.material.reflectivity = 0.5;
+            child.material.roughness = 0;
+            child.material.side = 2;
+            child.material.color = new THREE.Color("rgb(0,0, 0)");
           }
 
-          if (child.name == "shise_jelo" && child.material.name == "shishe_cheragh_jelo.1") {
-            // console.log(child.material.name)
+          if (child.name == "shise_cheragh_jelo" && child.material.name == "shishe_cheragh_jelo") {
             child.material.needsUpdate = true;
             child.material.opacity = 1;
             child.material.metalness = 0;
@@ -178,18 +178,26 @@ function init() {
             child.material.transmission = 0.9; // ------------------------
             // ------------------------
             // add glow
-            // child.add( meshs );
 
-            meshs.position.z = 50;
-            meshs.position.x = 15;
+            child.add(meshs);
+            meshs.position.z = 70;
+            meshs.position.x = 95;
             meshs.position.y = 5;
             meshs.lookAt(camera.position);
             child.add(meshs); // console.log(child)
           }
 
-          if (child.name == "rahnama_borzorg") {
+          if (child.name == "cheragh_rahnama_jelo") {
             child.material.needsUpdate = true;
             child.material.emissive = new THREE.Color("rgb(255,51, 0)");
+          }
+
+          if (child.name == "ring") {
+            child.material.needsUpdate = true;
+            child.material.color = new THREE.Color("rgb(75,75, 75)");
+            child.material.roughness = 0.3;
+            child.material.metalness = 0.6;
+            child.material.reflectivity = 0.4;
           }
         }
       }); // spotlight
@@ -259,7 +267,7 @@ function init() {
 
   controls.dampingFactor = 0.05;
   controls.screenSpacePanning = false;
-  controls.minDistance = 1000;
+  controls.minDistance = 200;
   controls.maxDistance = 1500;
   controls.maxPolarAngle = Math.PI / 2; // controls.minDistance = 2;
   // controls.maxDistance = 10;
