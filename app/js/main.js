@@ -11,7 +11,7 @@ import * as THREE from 'three';
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,vector,meshs,sprite,floorTexture,tttt,xxxx;
+			var camera, scene, renderer,headlight1,headlight2,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,meshs,sprite,ftNormal,ftSpecular,tttt,ftSimple;
 
 			init();
       render();
@@ -96,19 +96,30 @@ import * as THREE from 'three';
         
         
 
-        
-        floorTexture = new THREE.ImageUtils.loadTexture( 'dist/textures/D_Asphalt_02_NOrmal.jpg' );
-        floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-        floorTexture.repeat.set( 12, 12 );
+        // normal
+        ftNormal = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_normal.jpg' );
+        ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping; 
+        ftNormal.repeat.set( 3, 2 );
 
+        // map
+        ftSimple = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+        ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping; 
+        ftSimple.repeat.set( 3, 2 );
+
+        // specular
+        ftSpecular = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Roughness.jpg' );
+        ftSpecular.wrapS = ftSpecular.wrapT = THREE.RepeatWrapping; 
+        ftSpecular.repeat.set( 3, 3 );
+
+        // displacement
+        ftDisplacement = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_Displacement.jpg');
+        ftDisplacement.wrapS = ftDisplacement.wrapT = THREE.RepeatWrapping;
+        ftDisplacement.repeat.set(3,2);
         
-        xxxx = new THREE.ImageUtils.loadTexture( 'dist/textures/D_Asphalt_02_DIFF.jpg' );
-        xxxx.wrapS = xxxx.wrapT = THREE.RepeatWrapping; 
-        xxxx.repeat.set( 12, 12 );
         
 
         // ground
-        var material = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true ,normalMap: floorTexture ,map:xxxx } );
+        var material = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true ,normalMap: ftNormal ,map:ftSimple,displacementMap:ftDisplacement } );
 				var geometry = new THREE.PlaneBufferGeometry( 8000, 8000 );
         var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, 0, 900 );
@@ -131,12 +142,12 @@ import * as THREE from 'three';
 
 
         // test target
-        var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true,normalMap: floorTexture,map:xxxx } );
-				var geometry2= new THREE.PlaneBufferGeometry( 8000, 8000 );
-        var mesh2 = new THREE.Mesh( geometry2, material2 );
-				mesh2.position.set( 0, 0, 900 );
-				mesh2.rotation.x = - Math.PI * 0.5;
-				mesh2.receiveShadow = true;
+        // var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true,normalMap: ftNormal,normalScale:(1,1),map:ftSimple } );
+				// var geometry2= new THREE.PlaneBufferGeometry( 8000, 8000 );
+        // var mesh2 = new THREE.Mesh( geometry2, material2 );
+				// mesh2.position.set( 0, 0, 899 );
+				// mesh2.rotation.x = - Math.PI * 0.5;
+				// mesh2.receiveShadow = true;
         // scene.add( mesh2 );
         
 
@@ -244,7 +255,7 @@ import * as THREE from 'three';
               headlight2.angle = angle;
               headlight2.penumbra = penumbra;
               headlight2.position.set(100, 0, 550);
-              headlight2.target = mesh2;
+              // headlight2.target = mesh2;
               headlight2.target.position.x = 100;
               // headlight2.target.position.set(0, 0, 400);
               gltf.scene.add(headlight2);
