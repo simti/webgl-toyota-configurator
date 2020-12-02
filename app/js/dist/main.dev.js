@@ -41,7 +41,7 @@ function init() {
   // container.offsetWidth,container.offsetHeight
 
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
-  camera.position.set(400, 200, 300); // scene
+  camera.position.set(400, 300, 300); // scene
 
   scene = new THREE.Scene(); // scene.add( new THREE.AxesHelper(1000));
   //makes color brighter and stronger
@@ -116,28 +116,19 @@ function init() {
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, 0, 900);
   mesh.rotation.x = -Math.PI * 0.5;
-  mesh.receiveShadow = true; // scene.add( mesh );
-  // tttt = new THREE.PlaneBufferGeometry( 8000, 8000 );
-  // const groundMirror = new Reflector( tttt, {
-  // 	clipBias: 0.003,
-  // 	textureWidth: window.innerWidth * window.devicePixelRatio,
-  // 	textureHeight: window.innerHeight * window.devicePixelRatio,
-  //   color: 0x777777,
-  //   opacity:0,
-  //   transparent:true
-  // } );
-  // groundMirror.position.set( 0, -110, 900 );
-  // groundMirror.rotateX( - Math.PI / 2 );
-  // scene.add( groundMirror );
-  // test target
-  // var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true,normalMap: ftNormal,normalScale:(1,1),map:ftSimple } );
-  // var geometry2= new THREE.PlaneBufferGeometry( 8000, 8000 );
-  // var mesh2 = new THREE.Mesh( geometry2, material2 );
-  // mesh2.position.set( 0, 0, 899 );
-  // mesh2.rotation.x = - Math.PI * 0.5;
-  // mesh2.receiveShadow = true;
-  // scene.add( mesh2 );
-  // load hdri and car object
+  mesh.receiveShadow = true;
+  scene.add(mesh); // test target
+
+  var material2 = new THREE.MeshPhongMaterial({
+    opacity: 0,
+    visible: false
+  });
+  var geometry2 = new THREE.PlaneBufferGeometry(8000, 8000);
+  var mesh2 = new THREE.Mesh(geometry2, material2);
+  mesh2.position.set(0, 0, 899);
+  mesh2.rotation.x = -Math.PI * 0.5;
+  mesh2.receiveShadow = true;
+  scene.add(mesh2); // load hdri and car object
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('studio.hdr', function (texture) {
     var envMap = pmremGenerator.fromEquirectangular(texture).texture; // scene.background = envMap;
@@ -218,7 +209,7 @@ function init() {
       headlight1.distance = dist;
       headlight1.angle = angle;
       headlight1.penumbra = penumbra;
-      headlight1.position.set(-100, 0, 550);
+      headlight1.position.set(-100, 180, 550);
       headlight1.target = mesh;
       headlight1.target.position.x = -100;
       gltf.scene.add(headlight1);
@@ -228,9 +219,9 @@ function init() {
       headlight2.distance = dist;
       headlight2.angle = angle;
       headlight2.penumbra = penumbra;
-      headlight2.position.set(100, 0, 550); // headlight2.target = mesh2;
-
-      headlight2.target.position.x = 100; // headlight2.target.position.set(0, 0, 400);
+      headlight2.position.set(100, 180, 550);
+      headlight2.target = mesh2;
+      headlight2.target.position.x = 100; // headlight2.target.position.set(100, 0, -400);
 
       gltf.scene.add(headlight2);
       gltf.scene.add(headlight2.target);
@@ -275,7 +266,7 @@ function init() {
   controls.screenSpacePanning = false;
   controls.minDistance = 200;
   controls.maxDistance = 1500;
-  controls.maxPolarAngle = Math.PI / 2; // controls.minDistance = 2;
+  controls.maxPolarAngle = Math.PI / 2 - THREE.Math.degToRad(10); // controls.minDistance = 2;
   // controls.maxDistance = 10;
   // controls.target.set( 0, 0, - 0.2 );
 
