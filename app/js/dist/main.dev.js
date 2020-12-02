@@ -10,6 +10,8 @@ var _GLTFLoader = require("three/examples/jsm/loaders/GLTFLoader.js");
 
 var _RGBELoader = require("three/examples/jsm/loaders/RGBELoader.js");
 
+var _EXRLoader = require("three/examples/jsm/loaders/EXRLoader.js");
+
 var _RoughnessMipmapper = require("three/examples/jsm/utils/RoughnessMipmapper.js");
 
 var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer.js");
@@ -27,7 +29,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var container, controls;
-var camera, scene, renderer, headlight1, headlight2, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, ftDisplacement, vector, meshs, sprite, ftNormal, ftSpecular, tttt, ftSimple;
+var camera, scene, renderer, left_headlight, right_headlight, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, ftDisplacement, vector, headlight_flare_right, headlight_flare_left, sprite, ftNormal, ftSpecular, tttt, ftSimple;
 init();
 render(); // animate();
 
@@ -47,8 +49,7 @@ function init() {
   //makes color brighter and stronger
 
   var light = new THREE.AmbientLight(0x222222);
-  scene.add(light); // car shadow
-  // Texture
+  scene.add(light); // Texture
 
   var shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.jpg"); // Plane
 
@@ -61,33 +62,46 @@ function init() {
     transparent: true,
     opacity: 0
   }); // Mesh
-  // const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
-  // shadowMesh.position.y = - 170;
-  // shadowMesh.position.z = 50;
-  // shadowMesh.rotation.y = Math.PI / 2;
-  // scene.add(shadowMesh)
-  // ground
 
-  var ma = new THREE.MeshBasicMaterial((_ref = {
+  var shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
+  shadowMesh.position.y = 1;
+  shadowMesh.position.z = 50;
+  shadowMesh.rotation.y = Math.PI / 2;
+  scene.add(shadowMesh); // headlight flares
+
+  var headlight_flare_material = new THREE.MeshBasicMaterial((_ref = {
     color: 0x000000,
     dithering: true,
     side: THREE.FrontSide,
     map: new THREE.ImageUtils.loadTexture('dist/textures/123.png'),
     useScreenCoordinates: false
   }, _defineProperty(_ref, "color", 0xffffff), _defineProperty(_ref, "transparent", true), _defineProperty(_ref, "blending", THREE.AdditiveBlending), _ref));
-  var ge = new THREE.PlaneBufferGeometry(180, 150);
-  meshs = new THREE.Mesh(ge, ma); // meshs.scale.set(0.6,0.6);
+  var headlight_flare_geometry = new THREE.PlaneBufferGeometry(180, 150);
+  headlight_flare_right = new THREE.Mesh(headlight_flare_geometry, headlight_flare_material); // headlight_flare_right.scale.set(0.6,0.6);
 
-  meshs.renderOrder = 999;
+  headlight_flare_right.renderOrder = 999;
 
-  meshs.onBeforeRender = function (renderer) {
+  headlight_flare_right.onBeforeRender = function (renderer) {
     renderer.clearDepth();
-  }; // meshs.lookAt(camera.position)
-  // scene.add( meshs );
+  }; // headlight_flare_right.lookAt(camera.position)
+  // scene.add( headlight_flare_right );
 
 
-  meshs.opacity = 0;
-  meshs.lookAt(camera.position); // normal
+  headlight_flare_right.opacity = 0;
+  headlight_flare_right.lookAt(camera.position);
+  headlight_flare_left = new THREE.Mesh(headlight_flare_geometry, headlight_flare_material); // headlight_flare_left.scale.set(0.6,0.6);
+
+  headlight_flare_left.renderOrder = 999;
+
+  headlight_flare_left.onBeforeRender = function (renderer) {
+    renderer.clearDepth();
+  }; // headlight_flare_left.lookAt(camera.position)
+  // scene.add( headlight_flare_left );
+
+
+  headlight_flare_left.opacity = 0;
+  headlight_flare_left.lookAt(camera.position); // end of headlight flares
+  // normal
 
   ftNormal = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_normal.jpg');
   ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping;
@@ -112,7 +126,7 @@ function init() {
     map: ftSimple,
     displacementMap: ftDisplacement
   });
-  var geometry = new THREE.PlaneBufferGeometry(8000, 8000);
+  var geometry = new THREE.PlaneBufferGeometry(4000, 6000);
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, 0, 900);
   mesh.rotation.x = -Math.PI * 0.5;
@@ -123,17 +137,17 @@ function init() {
     opacity: 0,
     visible: false
   });
-  var geometry2 = new THREE.PlaneBufferGeometry(8000, 8000);
+  var geometry2 = new THREE.PlaneBufferGeometry(4000, 6000);
   var mesh2 = new THREE.Mesh(geometry2, material2);
   mesh2.position.set(0, 0, 899);
   mesh2.rotation.x = -Math.PI * 0.5;
   mesh2.receiveShadow = true;
   scene.add(mesh2); // load hdri and car object
 
-  new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('studio.hdr', function (texture) {
-    var envMap = pmremGenerator.fromEquirectangular(texture).texture; // scene.background = envMap;
+  new _EXRLoader.EXRLoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('GSG_PRO_STUDIOS_METAL_043_sm.exr', function (texture) {
+    var envMap = pmremGenerator.fromEquirectangular(texture).texture;
+    scene.background = envMap; // scene.background = pmremGenerator.renderTarget;
 
-    scene.background = pmremGenerator.renderTarget;
     scene.environment = envMap;
     texture.dispose();
     pmremGenerator.dispose();
@@ -143,7 +157,7 @@ function init() {
     loader.load('final.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
         if (child.isMesh) {
-          console.log(child);
+          // console.log(child)
           child.castShadow = true;
           child.receiveShadow = true;
 
@@ -167,21 +181,27 @@ function init() {
           }
 
           if (child.name == "shise_cheragh_jelo" && child.material.name == "shishe_cheragh_jelo") {
+            // console.log(child)
             child.material.needsUpdate = true;
             child.material.opacity = 1;
             child.material.metalness = 0;
             child.material.reflectivity = 1;
             child.material.roughness = 0;
-            child.material.transmission = 0.9; // ------------------------
-            // ------------------------
-            // add glow
+            child.material.transmission = 0.9; // add glow left
 
-            child.add(meshs);
-            meshs.position.z = 70;
-            meshs.position.x = 95;
-            meshs.position.y = 5;
-            meshs.lookAt(camera.position);
-            child.add(meshs); // console.log(child)
+            child.add(headlight_flare_right);
+            headlight_flare_right.position.z = 55;
+            headlight_flare_right.position.x = 125;
+            headlight_flare_right.position.y = 5;
+            headlight_flare_right.lookAt(camera.position);
+            child.add(headlight_flare_right); // add glow right
+
+            child.add(headlight_flare_left);
+            headlight_flare_left.position.z = 55;
+            headlight_flare_left.position.x = -125;
+            headlight_flare_left.position.y = 5;
+            headlight_flare_left.lookAt(camera.position);
+            child.add(headlight_flare_left);
           }
 
           if (child.name == "cheragh_rahnama_jelo") {
@@ -205,36 +225,31 @@ function init() {
       var dist = 600;
       var penumbra = 0.5; //right headlight
 
-      headlight1 = new THREE.SpotLight(color, intensity);
-      headlight1.distance = dist;
-      headlight1.angle = angle;
-      headlight1.penumbra = penumbra;
-      headlight1.position.set(-100, 180, 550);
-      headlight1.target = mesh;
-      headlight1.target.position.x = -100;
-      gltf.scene.add(headlight1);
-      gltf.scene.add(headlight1.target); //left headlight
+      left_headlight = new THREE.SpotLight(color, intensity);
+      left_headlight.distance = dist;
+      left_headlight.angle = angle;
+      left_headlight.penumbra = penumbra;
+      left_headlight.position.set(-100, 180, 550);
+      left_headlight.target = mesh;
+      left_headlight.target.position.x = -100;
+      gltf.scene.add(left_headlight);
+      gltf.scene.add(left_headlight.target); //left headlight
 
-      headlight2 = new THREE.SpotLight(color, intensity);
-      headlight2.distance = dist;
-      headlight2.angle = angle;
-      headlight2.penumbra = penumbra;
-      headlight2.position.set(100, 180, 550);
-      headlight2.target = mesh2;
-      headlight2.target.position.x = 100; // headlight2.target.position.set(100, 0, -400);
+      right_headlight = new THREE.SpotLight(color, intensity);
+      right_headlight.distance = dist;
+      right_headlight.angle = angle;
+      right_headlight.penumbra = penumbra;
+      right_headlight.position.set(100, 180, 550);
+      right_headlight.target = mesh2;
+      right_headlight.target.position.x = 100; // right_headlight.target.position.set(100, 0, -400);
 
-      gltf.scene.add(headlight2);
-      gltf.scene.add(headlight2.target);
-      gltf.scene.position.set(0, 0, 0); // const helper1 = new THREE.SpotLightHelper(headlight1);
-      // const helper2 = new THREE.SpotLightHelper(headlight2);
-      // gltf.scene.add(helper1);
-      // gltf.scene.add(helper2);
-
+      gltf.scene.add(right_headlight);
+      gltf.scene.add(right_headlight.target);
+      gltf.scene.position.set(0, 0, 0);
       scene.add(gltf.scene);
       roughnessMipmapper.dispose();
       render();
-    }, function (xhr) {
-      console.log(xhr.loaded / xhr.total * 100 + '% loaded');
+    }, function (xhr) {// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
     });
   }); // renderer
 
@@ -249,13 +264,7 @@ function init() {
 
   container.appendChild(renderer.domElement);
   var pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader(); //post processing
-  // composer = new EffectComposer( renderer );
-  // renderPass = new RenderPass( scene, camera );
-  // composer.addPass( renderPass );
-  // glitchPass = new GlitchPass();
-  // composer.addPass( glitchPass );
-  // orbit controller
+  pmremGenerator.compileEquirectangularShader(); // orbit controller
 
   controls = new _OrbitControls.OrbitControls(camera, renderer.domElement);
   controls.addEventListener('change', render); // use if there is no animation loop
@@ -264,51 +273,41 @@ function init() {
 
   controls.dampingFactor = 0.05;
   controls.screenSpacePanning = false;
-  controls.minDistance = 200;
-  controls.maxDistance = 1500;
+  controls.minDistance = 1000;
+  controls.maxDistance = 1200;
   controls.maxPolarAngle = Math.PI / 2 - THREE.Math.degToRad(10); // controls.minDistance = 2;
   // controls.maxDistance = 10;
   // controls.target.set( 0, 0, - 0.2 );
 
   controls.update();
   window.addEventListener('resize', onWindowResize, false);
-} // gui
-// const gui = new GUI({
-//   height : 5 * 32 - 1
-// });
-// var params = {
-//   intensity: 1
-// };
-// gui.add(params, 'intensity', 0, 40).onChange(updateLight);
-
+}
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   render();
-} //
+}
 
+var euler, rotation, radians, degrees;
 
 function render() {
   renderer.render(scene, camera);
-  meshs.lookAt(camera.position);
-  vector = camera.getWorldDirection();
-  theta = Math.atan2(vector.x, vector.z); // console.log(Math.floor(THREE.Math.radToDeg(theta)))
-}
+  headlight_flare_right.lookAt(camera.position);
+  headlight_flare_left.lookAt(camera.position); // vector = camera.getWorldDirection();
+  // theta = Math.atan2(vector.x,vector.z);
+  // console.log(theta);
 
-function makeXYZGUI(gui, vector3, name, onChangeFn) {
-  var folder = gui.addFolder(name);
-  folder.add(vector3, 'x', -100, 100).onChange(onChangeFn);
-  folder.add(vector3, 'y', 0, 100).onChange(onChangeFn);
-  folder.add(vector3, 'z', -100, 100).onChange(onChangeFn);
-  folder.open();
-}
-
-function updateLight() {
-  headlight1.target.updateMatrixWorld();
-  headlight2.target.updateMatrixWorld(); // helper.update();
-} // function animate() {
+  euler = new THREE.Euler();
+  rotation = euler.setFromQuaternion(camera.quaternion);
+  radians = rotation.z > 0 ? rotation.z : 2 * Math.PI + rotation.z;
+  degrees = THREE.Math.radToDeg(radians); //  console.log(Math.floor(degrees))
+} // function updateLight() {
+//   left_headlight.target.updateMatrixWorld();
+//   right_headlight.target.updateMatrixWorld();
+// }
+// function animate() {
 //   requestAnimationFrame( animate );
 //   // composer.render();
 //   renderer.render();
