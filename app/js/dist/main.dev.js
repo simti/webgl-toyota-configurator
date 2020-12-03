@@ -147,7 +147,6 @@ function init() {
   // new EXRLoader()
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('night_city.hdr', function (texture) {
-    //38,43,37,36,34,35,33
     var envMap = pmremGenerator.fromEquirectangular(texture).texture;
     scene.background = envMap; // scene.background = pmremGenerator.renderTarget;
 
@@ -164,12 +163,12 @@ function init() {
           child.castShadow = true;
           child.receiveShadow = true;
 
-          if (child.name == "badane_mashin") {
+          if (child.material.name == "rang_badane_mashin") {
             child.material.needsUpdate = true;
             child.material.envMap = null;
-            child.material.metalness = 0.05;
-            child.material.reflectivity = 0.2;
-            child.material.roughness = 0.05;
+            child.material.metalness = 0.02;
+            child.material.reflectivity = 0.05;
+            child.material.roughness = 0.04;
             child.material.side = 2;
             child.renderOrder = 1;
             console.log(child);
@@ -286,7 +285,7 @@ function init() {
 
   controls.update();
   window.addEventListener('resize', onWindowResize, false);
-  scene.rotation.y = Math.PI / 4;
+  scene.rotation.y = Math.PI;
 }
 
 function onWindowResize() {
