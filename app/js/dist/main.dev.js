@@ -100,7 +100,7 @@ function init() {
 
 
   headlight_flare_left.opacity = 0;
-  headlight_flare_left.lookAt(camera.position); // end of headlight flares
+  headlight_flare_left.lookAt(camera.position); // end of headlight flares 
   // normal
 
   ftNormal = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_normal.jpg');
@@ -131,7 +131,8 @@ function init() {
   mesh.position.set(0, 0, 900);
   mesh.rotation.x = -Math.PI * 0.5;
   mesh.receiveShadow = true;
-  scene.add(mesh); // test target
+  scene.add(mesh);
+  console.log(mesh); // test target
 
   var material2 = new THREE.MeshPhongMaterial({
     opacity: 0,
@@ -143,8 +144,10 @@ function init() {
   mesh2.rotation.x = -Math.PI * 0.5;
   mesh2.receiveShadow = true;
   scene.add(mesh2); // load hdri and car object
+  // new EXRLoader()
 
-  new _EXRLoader.EXRLoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('GSG_PRO_STUDIOS_METAL_043_sm.exr', function (texture) {
+  new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('night_city.hdr', function (texture) {
+    //38,43,37,36,34,35,33
     var envMap = pmremGenerator.fromEquirectangular(texture).texture;
     scene.background = envMap; // scene.background = pmremGenerator.renderTarget;
 
@@ -164,10 +167,12 @@ function init() {
           if (child.name == "badane_mashin") {
             child.material.needsUpdate = true;
             child.material.envMap = null;
-            child.material.metalness = 0.4061918556690216;
-            child.material.reflectivity = 0.3;
-            child.material.roughness = 0.1878855562210083;
+            child.material.metalness = 0.05;
+            child.material.reflectivity = 0.2;
+            child.material.roughness = 0.05;
             child.material.side = 2;
+            child.renderOrder = 1;
+            console.log(child);
           }
 
           if (child.name == "Shishe_jelo") {
@@ -281,6 +286,7 @@ function init() {
 
   controls.update();
   window.addEventListener('resize', onWindowResize, false);
+  scene.rotation.y = Math.PI / 4;
 }
 
 function onWindowResize() {

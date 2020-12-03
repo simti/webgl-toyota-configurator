@@ -99,7 +99,7 @@ import * as THREE from 'three';
         headlight_flare_left.opacity = 0;
         headlight_flare_left.lookAt(camera.position);
 
-        // end of headlight flares
+        // end of headlight flares 
 
 
 
@@ -133,6 +133,7 @@ import * as THREE from 'three';
 				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
         scene.add( mesh );
+        console.log(mesh)
 
 
 
@@ -150,10 +151,11 @@ import * as THREE from 'three';
 
 
         // load hdri and car object
-				new EXRLoader()
+        // new EXRLoader()
+        new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'dist/env/' )
-					.load( 'GSG_PRO_STUDIOS_METAL_043_sm.exr', function ( texture ) {
+          .load( 'night_city.hdr', function ( texture ) {//38,43,37,36,34,35,33
             var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
             scene.background = envMap;
             // scene.background = pmremGenerator.renderTarget;
@@ -172,10 +174,12 @@ import * as THREE from 'three';
                     if(child.name == "badane_mashin"){
                         child.material.needsUpdate=true;
                         child.material.envMap=null;
-                        child.material.metalness=0.4061918556690216;
-                        child.material.reflectivity=0.3;
-                        child.material.roughness=0.1878855562210083;
+                        child.material.metalness=0.05;
+                        child.material.reflectivity=0.2;
+                        child.material.roughness=0.05;
                         child.material.side=2;  
+                        child.renderOrder=1;
+                        console.log(child)
                     }
 
                     if(child.name == "Shishe_jelo"){
@@ -299,7 +303,9 @@ import * as THREE from 'three';
         // controls.target.set( 0, 0, - 0.2 );
         controls.update();
         window.addEventListener( 'resize', onWindowResize, false );
-		  	}
+
+        scene.rotation.y = Math.PI/4;
+      }
 
 			function onWindowResize() {
 				camera.aspect = window.innerWidth / window.innerHeight;
