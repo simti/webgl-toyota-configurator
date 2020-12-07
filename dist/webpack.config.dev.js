@@ -7,7 +7,7 @@ var webpack = require('webpack');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-  watch: true,
+  watch: false,
   mode: "production",
   // performance: {
   //   hints: false

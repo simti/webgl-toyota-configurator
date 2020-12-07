@@ -15,8 +15,8 @@ import * as THREE from 'three';
 import { BackSide, DoubleSide } from 'three';
 
 			var container, controls;
-			var camera, scene, renderer,left_headlight,right_headlight,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,headlight_flare_right,headlight_flare_left,sprite,ftNormal,ftSpecular,tttt,ftSimple;
-
+			var camera, scene, renderer,left_headlight,right_headlight,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,headlight_flare_right,headlight_flare_left,sprite,ftNormal,ftSpecular,tttt,ftSimple,shadowMaterial;
+      var shadow = false;
 			init();
       render();
       // animate();
@@ -39,36 +39,13 @@ import { BackSide, DoubleSide } from 'three';
         // scene.add( new THREE.AxesHelper(1000));
         
         //makes color brighter and stronger
-        var light = new THREE.AmbientLight( 0x222222 );
+        var light = new THREE.AmbientLight( 0x0f0f0f );
         scene.add( light );
 
 
         // add rect lights to both sides of the car
-        addRectlights();
+        // addRectlights();
 
-
-        // Texture
-        const shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.jpg");
-
-        // Plane
-        const shadowPlane = new THREE.PlaneBufferGeometry(1200, 1200);
-        shadowPlane.rotateX(-Math.PI / 2);
-        
-
-        // Material
-        const shadowMaterial = new THREE.MeshBasicMaterial({
-            map: shadowTexture,
-            blending: THREE.MultiplyBlending,
-            transparent: true,
-            opacity:0
-        });
-
-        // Mesh
-        const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
-        shadowMesh.position.y = 1;
-        shadowMesh.position.z = 50;
-        shadowMesh.rotation.y = Math.PI / 2;
-        scene.add(shadowMesh)
 
 
         // headlight flares
@@ -110,10 +87,10 @@ import { BackSide, DoubleSide } from 'three';
         // normal
         ftNormal = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_normal.jpg' );
         ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping; 
-        ftNormal.repeat.set( 3, 2 );
+        ftNormal.repeat.set( 1, 1);
 
         // map
-        ftSimple = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+        ftSimple = new THREE.ImageUtils.loadTexture( 'dist/env/ny.jpg' );
         ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping; 
         ftSimple.repeat.set( 3, 2 );
 
@@ -130,14 +107,13 @@ import { BackSide, DoubleSide } from 'three';
         
 
         // ground
-        var material = new THREE.MeshPhongMaterial( { color: 0xffffff, dithering: true ,normalMap: ftNormal ,map:ftSimple,displacementMap:ftDisplacement } );
+        var material = new THREE.MeshBasicMaterial( { color: 0xffffff, dithering: true,map:ftSimple,visible:false} );
 				var geometry = new THREE.PlaneBufferGeometry( 4000, 6000 );
         var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, 0, 900 );
-				mesh.rotation.x = - Math.PI * 0.5;
+        mesh.rotation.x = - Math.PI * 0.5;
+        // mesh.rotation.z = Math.PI/6;
 				mesh.receiveShadow = true;
-        scene.add( mesh );
-        // console.log(mesh)
 
 
 
@@ -154,24 +130,22 @@ import { BackSide, DoubleSide } from 'three';
 
         
         //add env images
-        addEnv();
-
-
-
+        // addEnv();
         // load hdri and car object
         // new EXRLoader()
-        new RGBELoader()
-					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'dist/env/' )
-          .load( 'night_city.hdr', function ( texture ) {
-            var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+        // new RGBELoader()
+				// 	.setDataType( THREE.UnsignedByteType )
+				// 	.setPath( 'dist/env/' )
+        //   .load( 'night_city.hdr', function ( texture ) {
+        //     var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
             // scene.background = envMap;
-            scene.background = pmremGenerator.renderTarget;
-						scene.environment = envMap;
-						texture.dispose();
-						pmremGenerator.dispose();
-						render();
-						var roughnessMipmapper = new RoughnessMipmapper( renderer );
+            // scene.background = pmremGenerator.renderTarget;
+						// scene.environment = envMap;
+						// texture.dispose();
+						// pmremGenerator.dispose();
+						// render();
+            // var roughnessMipmapper = new RoughnessMipmapper( renderer );
+            addBackgroundEnv();
 						var loader = new GLTFLoader().setPath( 'dist/' );
 						loader.load( 'final.glb', function ( gltf ) {
 							gltf.scene.traverse( function ( child ) {
@@ -250,7 +224,6 @@ import { BackSide, DoubleSide } from 'three';
               const angle = Math.PI/4;
               const dist = 600;
               const penumbra = 0.5;
-
               //right headlight
               left_headlight = new THREE.SpotLight(color, intensity);
               left_headlight.distance = dist;
@@ -276,14 +249,16 @@ import { BackSide, DoubleSide } from 'three';
               
               gltf.scene.position.set(0,0,0);
               scene.add( gltf.scene );
-              
-							roughnessMipmapper.dispose();
+
+              addCarShadow()
+              shadow=true;
+							// roughnessMipmapper.dispose();
 							render();
             },function(xhr) {
               // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
             } );
-          } 
-        );
+        //   } 
+        // );
 
         // renderer
         renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -306,6 +281,8 @@ import { BackSide, DoubleSide } from 'three';
         controls.minDistance = 1000;
         controls.maxDistance = 1200;
         controls.maxPolarAngle = Math.PI/2 - THREE.Math.degToRad(10);
+        // controls.maxAzimuthAngle  = Math.PI/8;
+        // controls.minAzimuthAngle = -Math.PI/8
         // controls.minDistance = 2;
         // controls.maxDistance = 10;
         // controls.target.set( 0, 0, - 0.2 );
@@ -336,7 +313,11 @@ import { BackSide, DoubleSide } from 'three';
             ? rotation.z
             : (2 * Math.PI) + rotation.z;
          degrees = THREE.Math.radToDeg(radians);
-        //  console.log(Math.floor(degrees))
+         if(shadow == true){
+           shadowMaterial.visible = true;
+         }
+
+         console.log(controls.getAzimuthalAngle ())
       }
 
       function addRectlights(){
@@ -367,7 +348,7 @@ import { BackSide, DoubleSide } from 'three';
       }
 
       function addEnv(){
-        var frontEnvMap = new THREE.ImageUtils.loadTexture( 'dist/env/frontEnv.png' );
+        var frontEnvMap = new THREE.ImageUtils.loadTexture( 'dist/env/nx.png' );
         frontEnvMap.wrapS = frontEnvMap.wrapT = THREE.RepeatWrapping; 
         frontEnvMap.repeat.set( 1, 1 );
         // var backEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
@@ -377,13 +358,53 @@ import { BackSide, DoubleSide } from 'three';
         var FrontEnvMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff,map:frontEnvMap,side:BackSide } );
 				var FrontEnvGeometry = new THREE.PlaneBufferGeometry( 4000, 4000 );
         var FrontEnvMesh = new THREE.Mesh( FrontEnvGeometry, FrontEnvMaterial );
-        FrontEnvMesh.position.set( 0, 0, 3000 );
+        FrontEnvMesh.position.set( 0, 1000, 3000 );
         
 				// FrontEnvMesh.rotation.x = Math.PI *2;
         scene.add( FrontEnvMesh );
       }
       
 
+      function addCarShadow(){
+         // Texture
+         const shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.jpg");
+
+         // Plane
+         const shadowPlane = new THREE.PlaneBufferGeometry(1200, 1200);
+         shadowPlane.rotateX(-Math.PI / 2);
+         
+ 
+         // Material
+         shadowMaterial = new THREE.MeshBasicMaterial({
+             map: shadowTexture,
+             blending: THREE.MultiplyBlending,
+             transparent: true,
+             opacity:0,
+             visible: false
+         });
+ 
+         // Mesh
+         const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
+         shadowMesh.position.y = 1;
+         shadowMesh.position.z = 50;
+         shadowMesh.rotation.y = Math.PI / 2;
+         scene.add(shadowMesh);
+      }
+
+
+      function addBackgroundEnv() {
+        var bg = new THREE.CubeTextureLoader()
+            .setPath("dist/env/")
+            .load([
+                'px.png',
+                'nx.png',
+                'py.png',
+                'ny.png',
+                'pz.png',
+                'nz.png'
+            ]);
+        scene.background = bg; // new THREE.Color(0x333333)
+    }
       // function updateLight() {
       //   left_headlight.target.updateMatrixWorld();
       //   right_headlight.target.updateMatrixWorld();
