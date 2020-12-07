@@ -147,9 +147,9 @@ function init() {
   // new EXRLoader()
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('night_city.hdr', function (texture) {
-    var envMap = pmremGenerator.fromEquirectangular(texture).texture;
-    scene.background = envMap; // scene.background = pmremGenerator.renderTarget;
+    var envMap = pmremGenerator.fromEquirectangular(texture).texture; // scene.background = envMap;
 
+    scene.background = pmremGenerator.renderTarget;
     scene.environment = envMap;
     texture.dispose();
     pmremGenerator.dispose();
