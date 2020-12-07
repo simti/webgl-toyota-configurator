@@ -46,7 +46,7 @@ function init() {
   document.body.appendChild(container); // camera
   // container.offsetWidth,container.offsetHeight
 
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 6000);
   camera.position.set(400, 300, 300); // scene
 
   scene = new THREE.Scene(); // scene.add( new THREE.AxesHelper(1000));
@@ -150,7 +150,9 @@ function init() {
   mesh2.rotation.x = -Math.PI * 0.5;
   mesh2.receiveShadow = true;
   scene.add(mesh2); // background plane
-  // load hdri and car object
+  //add env images
+
+  addEnv(); // load hdri and car object
   // new EXRLoader()
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('night_city.hdr', function (texture) {
@@ -321,11 +323,11 @@ function addRectlights() {
 
   _RectAreaLightUniformsLib.RectAreaLightUniformsLib.init();
 
-  rectLight1 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+  rectLight1 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
   rectLight1.position.set(-400, 100, 0);
   rectLight1.rotateY(THREE.Math.degToRad(-90));
   scene.add(rectLight1);
-  rectLight2 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+  rectLight2 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
   rectLight2.position.set(400, 100, 0);
   rectLight2.rotateY(THREE.Math.degToRad(90));
   scene.add(rectLight2);
@@ -338,6 +340,25 @@ function addRectlights() {
   // rectLight2.add(rectHelper2);
   // rectHelper3 = new RectAreaLightHelper(rectLight3);
   // rectLight3.add(rectHelper3);
+}
+
+function addEnv() {
+  var frontEnvMap = new THREE.ImageUtils.loadTexture('dist/env/frontEnv.png');
+  frontEnvMap.wrapS = frontEnvMap.wrapT = THREE.RepeatWrapping;
+  frontEnvMap.repeat.set(1, 1); // var backEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+  // var rightEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+  // var leftEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+
+  var FrontEnvMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    map: frontEnvMap,
+    side: THREE.BackSide
+  });
+  var FrontEnvGeometry = new THREE.PlaneBufferGeometry(4000, 4000);
+  var FrontEnvMesh = new THREE.Mesh(FrontEnvGeometry, FrontEnvMaterial);
+  FrontEnvMesh.position.set(0, 0, 3000); // FrontEnvMesh.rotation.x = Math.PI *2;
+
+  scene.add(FrontEnvMesh);
 } // function updateLight() {
 //   left_headlight.target.updateMatrixWorld();
 //   right_headlight.target.updateMatrixWorld();

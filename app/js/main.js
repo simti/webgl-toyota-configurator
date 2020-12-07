@@ -12,6 +12,7 @@ import * as THREE from 'three';
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
       import {RectAreaLightUniformsLib} from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
       import {RectAreaLightHelper} from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
+import { BackSide, DoubleSide } from 'three';
 
 			var container, controls;
 			var camera, scene, renderer,left_headlight,right_headlight,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,headlight_flare_right,headlight_flare_left,sprite,ftNormal,ftSpecular,tttt,ftSimple;
@@ -30,7 +31,7 @@ import * as THREE from 'three';
         
         // camera
         // container.offsetWidth,container.offsetHeight
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 6000);
         camera.position.set(400, 300, 300);
 
         // scene
@@ -152,7 +153,8 @@ import * as THREE from 'three';
         // background plane
 
         
-
+        //add env images
+        addEnv();
 
 
 
@@ -341,12 +343,12 @@ import * as THREE from 'three';
         let rectLight1,rectLight2,rectLight3,rectHelper1,rectHelper2,rectHelper3;
         	RectAreaLightUniformsLib.init();
 
-          rectLight1 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+          rectLight1 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
           rectLight1.position.set(-400, 100, 0);
           rectLight1.rotateY(THREE.Math.degToRad(-90));
           scene.add(rectLight1);
 
-          rectLight2 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+          rectLight2 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
           rectLight2.position.set(400, 100, 0);
           rectLight2.rotateY(THREE.Math.degToRad(90));
           scene.add(rectLight2);
@@ -362,6 +364,23 @@ import * as THREE from 'three';
           // rectLight2.add(rectHelper2);
           // rectHelper3 = new RectAreaLightHelper(rectLight3);
           // rectLight3.add(rectHelper3);
+      }
+
+      function addEnv(){
+        var frontEnvMap = new THREE.ImageUtils.loadTexture( 'dist/env/frontEnv.png' );
+        frontEnvMap.wrapS = frontEnvMap.wrapT = THREE.RepeatWrapping; 
+        frontEnvMap.repeat.set( 1, 1 );
+        // var backEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+        // var rightEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+        // var leftEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
+
+        var FrontEnvMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff,map:frontEnvMap,side:BackSide } );
+				var FrontEnvGeometry = new THREE.PlaneBufferGeometry( 4000, 4000 );
+        var FrontEnvMesh = new THREE.Mesh( FrontEnvGeometry, FrontEnvMaterial );
+        FrontEnvMesh.position.set( 0, 0, 3000 );
+        
+				// FrontEnvMesh.rotation.x = Math.PI *2;
+        scene.add( FrontEnvMesh );
       }
       
 
