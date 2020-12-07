@@ -22,6 +22,10 @@ var _GlitchPass = require("three/examples/jsm/postprocessing/GlitchPass.js");
 
 var _Reflector = require("three/examples/jsm/objects/Reflector");
 
+var _RectAreaLightUniformsLib = require("three/examples/jsm/lights/RectAreaLightUniformsLib.js");
+
+var _RectAreaLightHelper = require("three/examples/jsm/helpers/RectAreaLightHelper.js");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -49,7 +53,9 @@ function init() {
   //makes color brighter and stronger
 
   var light = new THREE.AmbientLight(0x222222);
-  scene.add(light); // Texture
+  scene.add(light); // add rect lights to both sides of the car
+
+  addRectlights(); // Texture
 
   var shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.jpg"); // Plane
 
@@ -131,8 +137,8 @@ function init() {
   mesh.position.set(0, 0, 900);
   mesh.rotation.x = -Math.PI * 0.5;
   mesh.receiveShadow = true;
-  scene.add(mesh);
-  console.log(mesh); // test target
+  scene.add(mesh); // console.log(mesh)
+  // test target
 
   var material2 = new THREE.MeshPhongMaterial({
     opacity: 0,
@@ -143,7 +149,8 @@ function init() {
   mesh2.position.set(0, 0, 899);
   mesh2.rotation.x = -Math.PI * 0.5;
   mesh2.receiveShadow = true;
-  scene.add(mesh2); // load hdri and car object
+  scene.add(mesh2); // background plane
+  // load hdri and car object
   // new EXRLoader()
 
   new _RGBELoader.RGBELoader().setDataType(THREE.UnsignedByteType).setPath('dist/env/').load('night_city.hdr', function (texture) {
@@ -170,8 +177,7 @@ function init() {
             child.material.reflectivity = 0.05;
             child.material.roughness = 0.04;
             child.material.side = 2;
-            child.renderOrder = 1;
-            console.log(child);
+            child.renderOrder = 1; // console.log(child)
           }
 
           if (child.name == "Shishe_jelo") {
@@ -308,6 +314,30 @@ function render() {
   rotation = euler.setFromQuaternion(camera.quaternion);
   radians = rotation.z > 0 ? rotation.z : 2 * Math.PI + rotation.z;
   degrees = THREE.Math.radToDeg(radians); //  console.log(Math.floor(degrees))
+}
+
+function addRectlights() {
+  var rectLight1, rectLight2, rectLight3, rectHelper1, rectHelper2, rectHelper3;
+
+  _RectAreaLightUniformsLib.RectAreaLightUniformsLib.init();
+
+  rectLight1 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+  rectLight1.position.set(-400, 100, 0);
+  rectLight1.rotateY(THREE.Math.degToRad(-90));
+  scene.add(rectLight1);
+  rectLight2 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+  rectLight2.position.set(400, 100, 0);
+  rectLight2.rotateY(THREE.Math.degToRad(90));
+  scene.add(rectLight2);
+  rectLight3 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+  rectLight3.position.set(0, 150, -600);
+  rectLight3.rotateX(THREE.Math.degToRad(-180));
+  scene.add(rectLight3); // rectHelper1 = new RectAreaLightHelper(rectLight1);
+  // rectLight1.add(rectHelper1);
+  // rectHelper2 = new RectAreaLightHelper(rectLight2);
+  // rectLight2.add(rectHelper2);
+  // rectHelper3 = new RectAreaLightHelper(rectLight3);
+  // rectLight3.add(rectHelper3);
 } // function updateLight() {
 //   left_headlight.target.updateMatrixWorld();
 //   right_headlight.target.updateMatrixWorld();

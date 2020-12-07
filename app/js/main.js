@@ -10,6 +10,8 @@ import * as THREE from 'three';
       import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
       import { Reflector } from 'three/examples/jsm/objects/Reflector'
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
+      import {RectAreaLightUniformsLib} from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
+      import {RectAreaLightHelper} from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
 
 			var container, controls;
 			var camera, scene, renderer,left_headlight,right_headlight,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,headlight_flare_right,headlight_flare_left,sprite,ftNormal,ftSpecular,tttt,ftSimple;
@@ -40,7 +42,8 @@ import * as THREE from 'three';
         scene.add( light );
 
 
-
+        // add rect lights to both sides of the car
+        addRectlights();
 
 
         // Texture
@@ -133,7 +136,7 @@ import * as THREE from 'three';
 				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
         scene.add( mesh );
-        console.log(mesh)
+        // console.log(mesh)
 
 
 
@@ -145,6 +148,9 @@ import * as THREE from 'three';
 				mesh2.rotation.x = - Math.PI * 0.5;
 				mesh2.receiveShadow = true;
         scene.add( mesh2 );
+
+        // background plane
+
         
 
 
@@ -179,7 +185,7 @@ import * as THREE from 'three';
                         child.material.roughness=0.04;
                         child.material.side=2;  
                         child.renderOrder=1;
-                        console.log(child)
+                        // console.log(child)
                     }
 
                     if(child.name == "Shishe_jelo"){
@@ -329,6 +335,33 @@ import * as THREE from 'three';
             : (2 * Math.PI) + rotation.z;
          degrees = THREE.Math.radToDeg(radians);
         //  console.log(Math.floor(degrees))
+      }
+
+      function addRectlights(){
+        let rectLight1,rectLight2,rectLight3,rectHelper1,rectHelper2,rectHelper3;
+        	RectAreaLightUniformsLib.init();
+
+          rectLight1 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+          rectLight1.position.set(-400, 100, 0);
+          rectLight1.rotateY(THREE.Math.degToRad(-90));
+          scene.add(rectLight1);
+
+          rectLight2 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+          rectLight2.position.set(400, 100, 0);
+          rectLight2.rotateY(THREE.Math.degToRad(90));
+          scene.add(rectLight2);
+
+          rectLight3 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+          rectLight3.position.set(0, 150, -600);
+          rectLight3.rotateX(THREE.Math.degToRad(-180));
+          scene.add(rectLight3);
+
+          // rectHelper1 = new RectAreaLightHelper(rectLight1);
+          // rectLight1.add(rectHelper1);
+          // rectHelper2 = new RectAreaLightHelper(rectLight2);
+          // rectLight2.add(rectHelper2);
+          // rectHelper3 = new RectAreaLightHelper(rectLight3);
+          // rectLight3.add(rectHelper3);
       }
       
 
