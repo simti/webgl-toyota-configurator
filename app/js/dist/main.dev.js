@@ -63,7 +63,10 @@ function init() {
   var light = new THREE.AmbientLight(0x222222);
   scene.add(light); // add rect lights to both sides of the car
 
-  addRectlights(); // headlight flares
+  addRectlights(); // hemisphere light
+
+  var hemisphere_light = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.7);
+  scene.add(hemisphere_light); // headlight flares
 
   var headlight_flare_material = new THREE.MeshBasicMaterial((_ref = {
     color: 0x000000,
@@ -162,17 +165,22 @@ function init() {
     loader.load('final.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
         if (child.isMesh) {
-          // console.log(child)
+          console.log(child);
           child.material.envMap = envMap;
           child.material.envMapIntensity = 1;
           child.material.needsUpdate = true;
           child.castShadow = true;
           child.receiveShadow = true;
 
+          if (child.material.name == "lastic") {
+            child.material.needsUpdate = true;
+            child.material.envMap = null;
+          }
+
           if (child.material.name == "rang_badane_mashin") {
             child.material.needsUpdate = true;
             child.material.envMap = envMap;
-            child.material.envMapIntensity = 3;
+            child.material.envMapIntensity = 1;
             child.material.metalness = 0.02;
             child.material.reflectivity = 0.05;
             child.material.roughness = 0.04;
@@ -183,7 +191,7 @@ function init() {
           if (child.name == "Shishe_jelo") {
             child.material.needsUpdate = true;
             child.material.envMap = envMap;
-            child.material.envMapIntensity = 3;
+            child.material.envMapIntensity = 1;
             child.material.metalness = 0;
             child.material.reflectivity = 0.5;
             child.material.roughness = 0;
@@ -242,9 +250,9 @@ function init() {
       left_headlight.penumbra = penumbra;
       left_headlight.position.set(-100, 180, 550);
       left_headlight.target = mesh;
-      left_headlight.target.position.x = -100;
-      gltf.scene.add(left_headlight);
-      gltf.scene.add(left_headlight.target); //left headlight
+      left_headlight.target.position.x = -100; // gltf.scene.add(left_headlight);
+      // gltf.scene.add(left_headlight.target);
+      //left headlight
 
       right_headlight = new THREE.SpotLight(color, intensity);
       right_headlight.distance = dist;
@@ -253,9 +261,9 @@ function init() {
       right_headlight.position.set(100, 180, 550);
       right_headlight.target = mesh2;
       right_headlight.target.position.x = 100; // right_headlight.target.position.set(100, 0, -400);
+      // gltf.scene.add(right_headlight);
+      // gltf.scene.add(right_headlight.target);
 
-      gltf.scene.add(right_headlight);
-      gltf.scene.add(right_headlight.target);
       gltf.scene.position.set(0, 0, 0);
       scene.add(gltf.scene);
       addCarShadow();
@@ -287,12 +295,13 @@ function init() {
   controls.dampingFactor = 0.05;
   controls.screenSpacePanning = false;
   controls.minDistance = 1000;
-  controls.maxDistance = 1200;
-  controls.maxPolarAngle = Math.PI / 2 - THREE.Math.degToRad(10);
-  controls.maxAzimuthAngle = Math.PI / 8;
-  controls.minAzimuthAngle = -Math.PI / 8;
+  controls.maxDistance = 3000;
+  controls.maxPolarAngle = Math.PI / 2 - THREE.Math.degToRad(10); // controls.maxAzimuthAngle  = Math.PI/8;
+  // controls.minAzimuthAngle = -Math.PI/8
+
   controls.update();
-  window.addEventListener('resize', onWindowResize, false); // scene.rotation.y = Math.PI;
+  window.addEventListener('resize', onWindowResize, false);
+  scene.rotation.y = Math.PI / 2;
 }
 
 function onWindowResize() {
@@ -327,42 +336,29 @@ function addRectlights() {
 
   _RectAreaLightUniformsLib.RectAreaLightUniformsLib.init();
 
-  rectLight1 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
-  rectLight1.position.set(-400, 100, 0);
-  rectLight1.rotateY(THREE.Math.degToRad(-90));
+  rectLight1 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
+  rectLight1.position.set(-1200, 100, -800);
+  rectLight1.rotateY(THREE.Math.degToRad(-90)); // rectLight1.rotateX(THREE.Math.degToRad(-45));
+
   scene.add(rectLight1);
-  rectLight2 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
-  rectLight2.position.set(400, 100, 0);
-  rectLight2.rotateY(THREE.Math.degToRad(90));
-  scene.add(rectLight2);
-  rectLight3 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
-  rectLight3.position.set(0, 150, -600);
-  rectLight3.rotateX(THREE.Math.degToRad(-180));
-  scene.add(rectLight3); // rectHelper1 = new RectAreaLightHelper(rectLight1);
-  // rectLight1.add(rectHelper1);
-  // rectHelper2 = new RectAreaLightHelper(rectLight2);
-  // rectLight2.add(rectHelper2);
-  // rectHelper3 = new RectAreaLightHelper(rectLight3);
+  rectLight2 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
+  rectLight2.position.set(-1200, 100, 800);
+  rectLight2.rotateY(THREE.Math.degToRad(-90)); // rectLight2.rotateX(THREE.Math.degToRad(-45));
+
+  scene.add(rectLight2); // rectLight2 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
+  // rectLight2.position.set(400, 100, 0);
+  // rectLight2.rotateY(THREE.Math.degToRad(90));
+  // scene.add(rectLight2);
+  // rectLight3 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
+  // rectLight3.position.set(0, 150, -600);
+  // rectLight3.rotateX(THREE.Math.degToRad(-180));
+  // scene.add(rectLight3);
+
+  rectHelper1 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight1);
+  rectLight1.add(rectHelper1);
+  rectHelper2 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight2);
+  rectLight2.add(rectHelper2); // // rectHelper3 = new RectAreaLightHelper(rectLight3);
   // rectLight3.add(rectHelper3);
-}
-
-function addEnv() {
-  var frontEnvMap = new THREE.ImageUtils.loadTexture('dist/env/nx.png');
-  frontEnvMap.wrapS = frontEnvMap.wrapT = THREE.RepeatWrapping;
-  frontEnvMap.repeat.set(1, 1); // var backEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
-  // var rightEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
-  // var leftEnvMap = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Albedo.jpg' );
-
-  var FrontEnvMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    map: frontEnvMap,
-    side: THREE.BackSide
-  });
-  var FrontEnvGeometry = new THREE.PlaneBufferGeometry(4000, 4000);
-  var FrontEnvMesh = new THREE.Mesh(FrontEnvGeometry, FrontEnvMaterial);
-  FrontEnvMesh.position.set(0, 1000, 3000); // FrontEnvMesh.rotation.x = Math.PI *2;
-
-  scene.add(FrontEnvMesh);
 }
 
 function addCarShadow() {
