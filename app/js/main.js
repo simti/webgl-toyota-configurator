@@ -12,11 +12,20 @@ import * as THREE from 'three';
       // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
       import {RectAreaLightUniformsLib} from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
       import {RectAreaLightHelper} from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
-import { BackSide, DoubleSide } from 'three';
+      import { BackSide, DoubleSide } from 'three';
 
 			var container, controls;
 			var camera, scene, renderer,left_headlight,right_headlight,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,headlight_flare_right,headlight_flare_left,sprite,ftNormal,ftSpecular,tttt,ftSimple,shadowMaterial;
       var shadow = false;
+
+
+      let setting={
+        camera:{
+          initial:[400,300,300]
+          // front,and other positions
+        },
+      }
+
 			init();
       render();
       // animate();
@@ -39,12 +48,13 @@ import { BackSide, DoubleSide } from 'three';
         // scene.add( new THREE.AxesHelper(1000));
         
         //makes color brighter and stronger
-        var light = new THREE.AmbientLight( 0x0f0f0f );
+        // var light = new THREE.AmbientLight( 0x0f0f0f );
+        var light = new THREE.AmbientLight( 0x222222 );
         scene.add( light );
 
 
         // add rect lights to both sides of the car
-        // addRectlights();
+        addRectlights();
 
 
 
@@ -146,16 +156,21 @@ import { BackSide, DoubleSide } from 'three';
 						// render();
             // var roughnessMipmapper = new RoughnessMipmapper( renderer );
             addBackgroundEnv();
+            getCubeMapTexture().then(({ envMap }) => {
 						var loader = new GLTFLoader().setPath( 'dist/' );
 						loader.load( 'final.glb', function ( gltf ) {
 							gltf.scene.traverse( function ( child ) {
                   if ( child.isMesh ) {
                     // console.log(child)
+                    child.material.envMap  = envMap;
+                    child.material.envMapIntensity =1;
+                    child.material.needsUpdate = true;
                     child.castShadow = true; 
                     child.receiveShadow = true;
                     if(child.material.name == "rang_badane_mashin"){
                         child.material.needsUpdate=true;
-                        child.material.envMap=null;
+                        child.material.envMap  = envMap;
+                        child.material.envMapIntensity =3;
                         child.material.metalness=0.02;
                         child.material.reflectivity=0.05;
                         child.material.roughness=0.04;
@@ -166,7 +181,8 @@ import { BackSide, DoubleSide } from 'three';
 
                     if(child.name == "Shishe_jelo"){
                         child.material.needsUpdate=true;
-                        child.material.envMap=null;
+                        child.material.envMap  = envMap;
+                        child.material.envMapIntensity =3;
                         child.material.metalness=0;
                         child.material.reflectivity=0.5;
                         child.material.roughness=0;
@@ -257,8 +273,8 @@ import { BackSide, DoubleSide } from 'three';
             },function(xhr) {
               // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
             } );
-        //   } 
-        // );
+          } 
+        );
 
         // renderer
         renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -281,15 +297,12 @@ import { BackSide, DoubleSide } from 'three';
         controls.minDistance = 1000;
         controls.maxDistance = 1200;
         controls.maxPolarAngle = Math.PI/2 - THREE.Math.degToRad(10);
-        // controls.maxAzimuthAngle  = Math.PI/8;
-        // controls.minAzimuthAngle = -Math.PI/8
-        // controls.minDistance = 2;
-        // controls.maxDistance = 10;
-        // controls.target.set( 0, 0, - 0.2 );
+        controls.maxAzimuthAngle  = Math.PI/8;
+        controls.minAzimuthAngle = -Math.PI/8
         controls.update();
         window.addEventListener( 'resize', onWindowResize, false );
 
-        scene.rotation.y = Math.PI;
+        // scene.rotation.y = Math.PI;
       }
 
 			function onWindowResize() {
@@ -317,7 +330,7 @@ import { BackSide, DoubleSide } from 'three';
            shadowMaterial.visible = true;
          }
 
-         console.log(controls.getAzimuthalAngle ())
+        //  console.log(controls.getAzimuthalAngle ())
       }
 
       function addRectlights(){
@@ -394,17 +407,34 @@ import { BackSide, DoubleSide } from 'three';
 
       function addBackgroundEnv() {
         var bg = new THREE.CubeTextureLoader()
-            .setPath("dist/env/")
+            .setPath("dist/env/envSky/")
             .load([
-                'px.png',
-                'nx.png',
-                'py.png',
-                'ny.png',
-                'pz.png',
-                'nz.png'
+                'px.jpg',
+                'nx.jpg',
+                'py.jpg',
+                'ny.jpg',
+                'pz.jpg',
+                'nz.jpg'
             ]);
         scene.background = bg; // new THREE.Color(0x333333)
     }
+
+    function getCubeMapTexture() {
+      return new Promise((resolve) => {
+          const envMap = new THREE.CubeTextureLoader()
+              .setPath("dist/env/envReflection/")
+              .load([
+                  'px.jpg',
+                  'nx.jpg',
+                  'py.jpg',
+                  'ny.jpg',
+                  'pz.jpg',
+                  'nz.jpg'
+              ]);
+          envMap.format = THREE.RGBFormat;
+          resolve({ envMap, cubeMap: envMap })
+      })
+  }
       // function updateLight() {
       //   left_headlight.target.updateMatrixWorld();
       //   right_headlight.target.updateMatrixWorld();

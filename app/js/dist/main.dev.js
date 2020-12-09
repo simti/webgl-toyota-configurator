@@ -35,6 +35,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var container, controls;
 var camera, scene, renderer, left_headlight, right_headlight, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, ftDisplacement, vector, headlight_flare_right, headlight_flare_left, sprite, ftNormal, ftSpecular, tttt, ftSimple, shadowMaterial;
 var shadow = false;
+var setting = {
+  camera: {
+    initial: [400, 300, 300] // front,and other positions
+
+  }
+};
 init();
 render(); // animate();
 
@@ -52,11 +58,12 @@ function init() {
 
   scene = new THREE.Scene(); // scene.add( new THREE.AxesHelper(1000));
   //makes color brighter and stronger
+  // var light = new THREE.AmbientLight( 0x0f0f0f );
 
-  var light = new THREE.AmbientLight(0x0f0f0f);
+  var light = new THREE.AmbientLight(0x222222);
   scene.add(light); // add rect lights to both sides of the car
-  // addRectlights();
-  // headlight flares
+
+  addRectlights(); // headlight flares
 
   var headlight_flare_material = new THREE.MeshBasicMaterial((_ref = {
     color: 0x000000,
@@ -149,109 +156,115 @@ function init() {
   // var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
   addBackgroundEnv();
-  var loader = new _GLTFLoader.GLTFLoader().setPath('dist/');
-  loader.load('final.glb', function (gltf) {
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        // console.log(child)
-        child.castShadow = true;
-        child.receiveShadow = true;
-
-        if (child.material.name == "rang_badane_mashin") {
-          child.material.needsUpdate = true;
-          child.material.envMap = null;
-          child.material.metalness = 0.02;
-          child.material.reflectivity = 0.05;
-          child.material.roughness = 0.04;
-          child.material.side = 2;
-          child.renderOrder = 1; // console.log(child)
-        }
-
-        if (child.name == "Shishe_jelo") {
-          child.material.needsUpdate = true;
-          child.material.envMap = null;
-          child.material.metalness = 0;
-          child.material.reflectivity = 0.5;
-          child.material.roughness = 0;
-          child.material.side = 2;
-          child.material.color = new THREE.Color("rgb(0,0, 0)");
-        }
-
-        if (child.name == "shise_cheragh_jelo" && child.material.name == "shishe_cheragh_jelo") {
+  getCubeMapTexture().then(function (_ref2) {
+    var envMap = _ref2.envMap;
+    var loader = new _GLTFLoader.GLTFLoader().setPath('dist/');
+    loader.load('final.glb', function (gltf) {
+      gltf.scene.traverse(function (child) {
+        if (child.isMesh) {
           // console.log(child)
+          child.material.envMap = envMap;
+          child.material.envMapIntensity = 1;
           child.material.needsUpdate = true;
-          child.material.opacity = 1;
-          child.material.metalness = 0;
-          child.material.reflectivity = 1;
-          child.material.roughness = 0;
-          child.material.transmission = 0.9; // add glow left
+          child.castShadow = true;
+          child.receiveShadow = true;
 
-          child.add(headlight_flare_right);
-          headlight_flare_right.position.z = 55;
-          headlight_flare_right.position.x = 125;
-          headlight_flare_right.position.y = 5;
-          headlight_flare_right.lookAt(camera.position);
-          child.add(headlight_flare_right); // add glow right
+          if (child.material.name == "rang_badane_mashin") {
+            child.material.needsUpdate = true;
+            child.material.envMap = envMap;
+            child.material.envMapIntensity = 3;
+            child.material.metalness = 0.02;
+            child.material.reflectivity = 0.05;
+            child.material.roughness = 0.04;
+            child.material.side = 2;
+            child.renderOrder = 1; // console.log(child)
+          }
 
-          child.add(headlight_flare_left);
-          headlight_flare_left.position.z = 55;
-          headlight_flare_left.position.x = -125;
-          headlight_flare_left.position.y = 5;
-          headlight_flare_left.lookAt(camera.position);
-          child.add(headlight_flare_left);
+          if (child.name == "Shishe_jelo") {
+            child.material.needsUpdate = true;
+            child.material.envMap = envMap;
+            child.material.envMapIntensity = 3;
+            child.material.metalness = 0;
+            child.material.reflectivity = 0.5;
+            child.material.roughness = 0;
+            child.material.side = 2;
+            child.material.color = new THREE.Color("rgb(0,0, 0)");
+          }
+
+          if (child.name == "shise_cheragh_jelo" && child.material.name == "shishe_cheragh_jelo") {
+            // console.log(child)
+            child.material.needsUpdate = true;
+            child.material.opacity = 1;
+            child.material.metalness = 0;
+            child.material.reflectivity = 1;
+            child.material.roughness = 0;
+            child.material.transmission = 0.9; // add glow left
+
+            child.add(headlight_flare_right);
+            headlight_flare_right.position.z = 55;
+            headlight_flare_right.position.x = 125;
+            headlight_flare_right.position.y = 5;
+            headlight_flare_right.lookAt(camera.position);
+            child.add(headlight_flare_right); // add glow right
+
+            child.add(headlight_flare_left);
+            headlight_flare_left.position.z = 55;
+            headlight_flare_left.position.x = -125;
+            headlight_flare_left.position.y = 5;
+            headlight_flare_left.lookAt(camera.position);
+            child.add(headlight_flare_left);
+          }
+
+          if (child.name == "cheragh_rahnama_jelo") {
+            child.material.needsUpdate = true;
+            child.material.emissive = new THREE.Color("rgb(255,51, 0)");
+          }
+
+          if (child.name == "ring") {
+            child.material.needsUpdate = true;
+            child.material.color = new THREE.Color("rgb(75,75, 75)");
+            child.material.roughness = 0.3;
+            child.material.metalness = 0.6;
+            child.material.reflectivity = 0.4;
+          }
         }
+      }); // spotlight
 
-        if (child.name == "cheragh_rahnama_jelo") {
-          child.material.needsUpdate = true;
-          child.material.emissive = new THREE.Color("rgb(255,51, 0)");
-        }
+      var color = 0xFFFFFF;
+      var intensity = 1;
+      var angle = Math.PI / 4;
+      var dist = 600;
+      var penumbra = 0.5; //right headlight
 
-        if (child.name == "ring") {
-          child.material.needsUpdate = true;
-          child.material.color = new THREE.Color("rgb(75,75, 75)");
-          child.material.roughness = 0.3;
-          child.material.metalness = 0.6;
-          child.material.reflectivity = 0.4;
-        }
-      }
-    }); // spotlight
+      left_headlight = new THREE.SpotLight(color, intensity);
+      left_headlight.distance = dist;
+      left_headlight.angle = angle;
+      left_headlight.penumbra = penumbra;
+      left_headlight.position.set(-100, 180, 550);
+      left_headlight.target = mesh;
+      left_headlight.target.position.x = -100;
+      gltf.scene.add(left_headlight);
+      gltf.scene.add(left_headlight.target); //left headlight
 
-    var color = 0xFFFFFF;
-    var intensity = 1;
-    var angle = Math.PI / 4;
-    var dist = 600;
-    var penumbra = 0.5; //right headlight
+      right_headlight = new THREE.SpotLight(color, intensity);
+      right_headlight.distance = dist;
+      right_headlight.angle = angle;
+      right_headlight.penumbra = penumbra;
+      right_headlight.position.set(100, 180, 550);
+      right_headlight.target = mesh2;
+      right_headlight.target.position.x = 100; // right_headlight.target.position.set(100, 0, -400);
 
-    left_headlight = new THREE.SpotLight(color, intensity);
-    left_headlight.distance = dist;
-    left_headlight.angle = angle;
-    left_headlight.penumbra = penumbra;
-    left_headlight.position.set(-100, 180, 550);
-    left_headlight.target = mesh;
-    left_headlight.target.position.x = -100;
-    gltf.scene.add(left_headlight);
-    gltf.scene.add(left_headlight.target); //left headlight
+      gltf.scene.add(right_headlight);
+      gltf.scene.add(right_headlight.target);
+      gltf.scene.position.set(0, 0, 0);
+      scene.add(gltf.scene);
+      addCarShadow();
+      shadow = true; // roughnessMipmapper.dispose();
 
-    right_headlight = new THREE.SpotLight(color, intensity);
-    right_headlight.distance = dist;
-    right_headlight.angle = angle;
-    right_headlight.penumbra = penumbra;
-    right_headlight.position.set(100, 180, 550);
-    right_headlight.target = mesh2;
-    right_headlight.target.position.x = 100; // right_headlight.target.position.set(100, 0, -400);
-
-    gltf.scene.add(right_headlight);
-    gltf.scene.add(right_headlight.target);
-    gltf.scene.position.set(0, 0, 0);
-    scene.add(gltf.scene);
-    addCarShadow();
-    shadow = true; // roughnessMipmapper.dispose();
-
-    render();
-  }, function (xhr) {// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-  }); //   } 
-  // );
-  // renderer
+      render();
+    }, function (xhr) {// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    });
+  }); // renderer
 
   renderer = new THREE.WebGLRenderer({
     antialias: true
@@ -275,15 +288,11 @@ function init() {
   controls.screenSpacePanning = false;
   controls.minDistance = 1000;
   controls.maxDistance = 1200;
-  controls.maxPolarAngle = Math.PI / 2 - THREE.Math.degToRad(10); // controls.maxAzimuthAngle  = Math.PI/8;
-  // controls.minAzimuthAngle = -Math.PI/8
-  // controls.minDistance = 2;
-  // controls.maxDistance = 10;
-  // controls.target.set( 0, 0, - 0.2 );
-
+  controls.maxPolarAngle = Math.PI / 2 - THREE.Math.degToRad(10);
+  controls.maxAzimuthAngle = Math.PI / 8;
+  controls.minAzimuthAngle = -Math.PI / 8;
   controls.update();
-  window.addEventListener('resize', onWindowResize, false);
-  scene.rotation.y = Math.PI;
+  window.addEventListener('resize', onWindowResize, false); // scene.rotation.y = Math.PI;
 }
 
 function onWindowResize() {
@@ -309,9 +318,8 @@ function render() {
 
   if (shadow == true) {
     shadowMaterial.visible = true;
-  }
+  } //  console.log(controls.getAzimuthalAngle ())
 
-  console.log(controls.getAzimuthalAngle());
 }
 
 function addRectlights() {
@@ -380,8 +388,19 @@ function addCarShadow() {
 }
 
 function addBackgroundEnv() {
-  var bg = new THREE.CubeTextureLoader().setPath("dist/env/").load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
+  var bg = new THREE.CubeTextureLoader().setPath("dist/env/envSky/").load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
   scene.background = bg; // new THREE.Color(0x333333)
+}
+
+function getCubeMapTexture() {
+  return new Promise(function (resolve) {
+    var envMap = new THREE.CubeTextureLoader().setPath("dist/env/envReflection/").load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
+    envMap.format = THREE.RGBFormat;
+    resolve({
+      envMap: envMap,
+      cubeMap: envMap
+    });
+  });
 } // function updateLight() {
 //   left_headlight.target.updateMatrixWorld();
 //   right_headlight.target.updateMatrixWorld();
