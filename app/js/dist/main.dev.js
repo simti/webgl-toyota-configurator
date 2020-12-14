@@ -305,9 +305,11 @@ function init() {
   controls.update();
   window.addEventListener('resize', onWindowResize, false);
   scene.rotation.y = Math.PI / 2;
+  add_eventListener();
 }
 
 function onWindowResize() {
+  console.log("resize");
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -414,3 +416,45 @@ function getCubeMapTexture() {
 //   // composer.render();
 //   renderer.render();
 // }
+// actions for html elements
+
+
+var active_sidebar = "";
+
+function add_eventListener() {
+  console.log("listeners added");
+  document.querySelector("button").addEventListener("click", function () {
+    return close_sidebar();
+  }, false);
+  document.querySelector("#part_panel").addEventListener("click", function () {
+    return open_sidebar('part');
+  }, false);
+  document.querySelector("#color_panel").addEventListener("click", function () {
+    return open_sidebar('color');
+  }, false);
+}
+
+function open_sidebar(title) {
+  active_sidebar = title;
+
+  if (title == "part") {
+    close_sidebar("color");
+    document.querySelector(".gui__sidebar--part").style.transform = "translate3d(0px, 0px, 0px)";
+  } else {
+    close_sidebar("part");
+    document.querySelector(".gui__sidebar--color").style.transform = "translate3d(0px, 0px, 0px)";
+  }
+
+  document.querySelector("#canvas").classList.add("smaller");
+  console.log();
+}
+
+function close_sidebar() {
+  if (active_sidebar == "part") {
+    document.querySelector(".gui__sidebar--part").style.transform = "translate3d(100%, 0px, 0px)";
+  } else {
+    document.querySelector(".gui__sidebar--color").style.transform = "translate3d(100%, 0px, 0px)";
+  }
+
+  document.querySelector("#canvas").classList.remove("smaller");
+}

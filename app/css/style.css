@@ -24,6 +24,18 @@
         overflow: hidden;
     }
 
+    button{
+        background: rgb(37, 37, 37);
+        color: white;
+        border: none;
+        padding: 10px;
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        border-radius: 30px;
+        z-index: 10;
+    }
+
     .gui__header{
         height: 48px;
         background-color: rgb(37, 37, 37);
@@ -36,7 +48,7 @@
         flex-direction: row;
         border-radius: 50px;
         box-shadow: rgba(0, 0, 0, 0.26) 2px 2px 15px 0px;
-        transition: width 250ms ease-in-out 0s;
+        transition: width 700ms ease-in-out 0s;
     }
 
     .item-seperator::after {
@@ -61,7 +73,7 @@
         padding: 0px;
         top: 50%;
         right: 0px;
-        transition: all 250ms ease-in-out 0s;
+        transition: all 700ms ease-in-out 0s;
         opacity: 1;
         pointer-events: inherit;
         position: relative;
@@ -73,7 +85,7 @@
         left: 50%;
         transform-origin: left top;
         transform: scale(1) translate3d(-50%, -50%, 0px);
-        transition: transform 250ms ease-in-out 0s;
+        transition: transform 700ms ease-in-out 0s;
         animation-name: ljZuES;
         animation-duration: 0.25s;
         animation-delay: 0s;
@@ -94,6 +106,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    z-index: 10;
     }
     .gui__footer--card{
         text-size-adjust: 100%;
@@ -124,7 +137,7 @@
         box-shadow: rgba(0, 0, 0, 0.26) 2px 2px 15px 0px;
         transform: translateY(0px);
         opacity: 1;
-        transition: transform 250ms cubic-bezier(0.1, 0.3, 0.15, 1) 0ms, opacity 250ms cubic-bezier(0.1, 0.3, 0.15, 1), box-shadow 0.2s ease-in;
+        transition: transform 700ms cubic-bezier(0.1, 0.3, 0.15, 1) 0ms, opacity 700ms cubic-bezier(0.1, 0.3, 0.15, 1), box-shadow 0.2s ease-in;
     }
 
     .card__inner{
@@ -219,7 +232,8 @@
         margin: 8px 0px 0px;
     }
 
-    .gui__sidebar--color{
+    .gui__sidebar--color,.gui__sidebar--part{
+        z-index: 10;
         line-height: 1.15;
         text-size-adjust: 100%;
         font-family: forsmartdigiRegular;
@@ -236,10 +250,11 @@
         overflow: hidden;
         color: rgb(255, 255, 255);
         background-color: rgb(25, 25, 25);
-        transition: transform 250ms ease-in-out 0s;
+        transition: transform 700ms ease-in-out 0s;
         transform: translate3d(100%, 0px, 0px);
         pointer-events: all;
     }
+
 
     .sidebar__header{
         line-height: 1.15;
@@ -290,27 +305,27 @@
         height: 1px;
         background-color: rgb(50, 50, 50);
         opacity: 1;
-        transition: all 250ms ease-out 0s;
+        transition: all 700ms ease-out 0s;
         margin: 0px auto;
         width: calc(90%);
     }
 
     .gui__sidebar--main{
-        width: 100%;
+        /* width: 100%; */
         height: 532px;
         overflow: hidden auto;
         transition: all 0.3s ease-out 0s;
         background-color: rgb(25, 25, 25);
         padding: 0px 5%;
     }
-    .color__information{
+    .color__information,.part__information{
         color: rgb(255, 255, 255);
         margin-top: 30px;
         margin-bottom: 20px;
         padding: 0px 5px;
     }
 
-    .color__information--title,.color__information--name{
+    .color__information--title,.color__information--name,.part__information--title,.part__information--name{
         display: flex;
         flex-direction: row;
         -webkit-box-pack: justify;
@@ -320,7 +335,7 @@
         margin-right: 10px;
     }
 
-    .color__selection{
+    .color__selection,.part__selection{
         line-height: 1.15;
         text-size-adjust: 100%;
         font-family: forsmartdigiRegular;
@@ -527,8 +542,107 @@
     }
 
 
+    /* parts detail cards */
+    .part__card{
+        line-height: 1.15;
+        text-size-adjust: 100%;
+        font-family: forsmartdigiRegular;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+        pointer-events: all;
+        touch-action: pan-x pan-y;
+        box-sizing: border-box;
+        position: relative;
+        display: flex;
+        padding: 5px 15px;
+        border-radius: 10px;
+        background-color: rgb(37, 37, 37);
+        margin: 10px 0px;
+        flex-direction: row;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        -webkit-box-align: center;
+        align-items: center;
+        opacity: 1;
+        transform: translate3d(0px, 25px, 0px);
+        will-change: opacity, transform;
+        min-height: 68px;
+        color: rgb(255, 255, 255);
+        animation: 0s cubic-bezier(0.35, 0.2, 0.15, 1) 0s 1 normal both running hWAFiE;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease-in 0s;
+    }
+
+    .part__card:hover{
+        transition: box-shadow 0.3s ease-out 0s;
+        box-shadow: rgba(0, 0, 0, 0.62) 0px 4px 12px 0px;
+        cursor: pointer;
+    }
+
+    .part__card--title{
+        text-size-adjust: 100%;
+        font-family: forsmartdigiRegular;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+        pointer-events: all;
+        color: rgb(255, 255, 255);
+        touch-action: pan-x pan-y;
+        box-sizing: border-box;
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        -webkit-box-pack: center;
+        justify-content: center;
+        line-height: 22px;
+        -webkit-box-flex: 1;
+        flex-grow: 1;
+        white-space: pre-line;
+        overflow: hidden;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .part__card--title>div{
+        text-size-adjust: 100%;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+        pointer-events: all;
+        color: rgb(255, 255, 255);
+        line-height: 22px;
+        white-space: pre-line;
+        touch-action: pan-x pan-y;
+        box-sizing: border-box;
+        font-family: forsmartdigiBold;
+    }
+
+    .part__card--icon{
+        line-height: 1.15;
+        text-size-adjust: 100%;
+        font-family: forsmartdigiRegular;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+        pointer-events: all;
+        color: rgb(255, 255, 255);
+        touch-action: pan-x pan-y;
+        box-sizing: border-box;
+        width: 30px;
+        height: 30px;
+        transform: rotateZ(180deg);
+        flex-shrink: 0;
+    }
+
     #canvas {
         width: 100%;
         height: 100vh;
-        background-color: red;
+        /* background-color: red; */
+        transition: transform 700ms ease-in-out 0s;
+    }
+
+    .smaller{
+        transform: translateX(-200px);
+        transition: transform 700ms ease-in-out 0s;
     }

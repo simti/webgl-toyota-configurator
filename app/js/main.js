@@ -40,7 +40,7 @@ import * as THREE from 'three';
         
         // camera
         // container.offsetWidth,container.offsetHeight
-        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 6000);
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth/ window.innerHeight, 1, 6000);
         camera.position.set(400, 300, 300);
 
         // scene
@@ -313,9 +313,12 @@ import * as THREE from 'three';
         window.addEventListener( 'resize', onWindowResize, false );
 
         scene.rotation.y = Math.PI/2;
+
+        add_eventListener();
       }
 
 			function onWindowResize() {
+        console.log("resize")
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize(window.innerWidth, window.innerHeight );
@@ -455,3 +458,35 @@ import * as THREE from 'three';
       
       // }
       
+
+      // actions for html elements
+      let active_sidebar="";
+      function add_eventListener(){
+        console.log("listeners added")
+          document.querySelector("button").addEventListener("click", () =>close_sidebar(), false);
+          document.querySelector("#part_panel").addEventListener("click", () =>open_sidebar('part'), false);
+          document.querySelector("#color_panel").addEventListener("click", () =>open_sidebar('color'), false);
+      }
+
+      function open_sidebar(title){
+        active_sidebar = title;
+        if(title == "part"){
+          close_sidebar("color")
+          document.querySelector(".gui__sidebar--part").style.transform = "translate3d(0px, 0px, 0px)";
+        }else{
+          close_sidebar("part")
+          document.querySelector(".gui__sidebar--color").style.transform = "translate3d(0px, 0px, 0px)";
+        }
+
+        document.querySelector("#canvas").classList.add("smaller")
+        console.log()
+      }
+
+      function close_sidebar(){
+        if(active_sidebar == "part"){
+          document.querySelector(".gui__sidebar--part").style.transform = "translate3d(100%, 0px, 0px)";
+        }else{
+          document.querySelector(".gui__sidebar--color").style.transform = "translate3d(100%, 0px, 0px)";
+        }
+        document.querySelector("#canvas").classList.remove("smaller")
+      }
