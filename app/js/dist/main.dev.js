@@ -87,6 +87,7 @@ function init() {
 
 
   headlight_flare_right.opacity = 0;
+  headlight_flare_right.visible = false;
   headlight_flare_right.lookAt(camera.position);
   headlight_flare_left = new THREE.Mesh(headlight_flare_geometry, headlight_flare_material); // headlight_flare_left.scale.set(0.6,0.6);
 
@@ -99,6 +100,7 @@ function init() {
 
 
   headlight_flare_left.opacity = 0;
+  headlight_flare_left.visible = false;
   headlight_flare_left.lookAt(camera.position); // end of headlight flares 
   // normal
 
@@ -106,7 +108,7 @@ function init() {
   ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping;
   ftNormal.repeat.set(1, 1); // map
 
-  ftSimple = new THREE.ImageUtils.loadTexture('dist/env/ny.jpg');
+  ftSimple = new THREE.ImageUtils.loadTexture('dist/env/envSky/ny.jpg');
   ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping;
   ftSimple.repeat.set(3, 2); // specular
 
@@ -161,11 +163,12 @@ function init() {
   addBackgroundEnv();
   getCubeMapTexture().then(function (_ref2) {
     var envMap = _ref2.envMap;
+    // scene.background = pmremGenerator.renderTarget; 
     var loader = new _GLTFLoader.GLTFLoader().setPath('dist/');
     loader.load('final.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
         if (child.isMesh) {
-          console.log(child);
+          // console.log(child)
           child.material.envMap = envMap;
           child.material.envMapIntensity = 1;
           child.material.needsUpdate = true;
@@ -332,33 +335,38 @@ function render() {
 }
 
 function addRectlights() {
-  var rectLight1, rectLight2, rectLight3, rectHelper1, rectHelper2, rectHelper3;
+  var rectLight1, rectLight2, rectLight3, rectLight4, rectHelper1, rectHelper2, rectHelper3, rectHelper4;
 
-  _RectAreaLightUniformsLib.RectAreaLightUniformsLib.init();
+  _RectAreaLightUniformsLib.RectAreaLightUniformsLib.init(); //right back
+
 
   rectLight1 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
   rectLight1.position.set(-1200, 100, -800);
-  rectLight1.rotateY(THREE.Math.degToRad(-90)); // rectLight1.rotateX(THREE.Math.degToRad(-45));
+  rectLight1.rotateY(THREE.Math.degToRad(-90));
+  scene.add(rectLight1); //right front
 
-  scene.add(rectLight1);
   rectLight2 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
   rectLight2.position.set(-1200, 100, 800);
-  rectLight2.rotateY(THREE.Math.degToRad(-90)); // rectLight2.rotateX(THREE.Math.degToRad(-45));
+  rectLight2.rotateY(THREE.Math.degToRad(-90));
+  scene.add(rectLight2); //left back
 
-  scene.add(rectLight2); // rectLight2 = new THREE.RectAreaLight(0xffffff, 10, 400, 100);
-  // rectLight2.position.set(400, 100, 0);
-  // rectLight2.rotateY(THREE.Math.degToRad(90));
-  // scene.add(rectLight2);
-  // rectLight3 = new THREE.RectAreaLight(0xffffff, 5, 400, 100);
-  // rectLight3.position.set(0, 150, -600);
-  // rectLight3.rotateX(THREE.Math.degToRad(-180));
-  // scene.add(rectLight3);
+  rectLight3 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
+  rectLight3.position.set(1200, 100, -800);
+  rectLight3.rotateY(THREE.Math.degToRad(90));
+  scene.add(rectLight3); //left front
 
+  rectLight4 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
+  rectLight4.position.set(1200, 100, 800);
+  rectLight4.rotateY(THREE.Math.degToRad(90));
+  scene.add(rectLight4);
   rectHelper1 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight1);
   rectLight1.add(rectHelper1);
   rectHelper2 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight2);
-  rectLight2.add(rectHelper2); // // rectHelper3 = new RectAreaLightHelper(rectLight3);
-  // rectLight3.add(rectHelper3);
+  rectLight2.add(rectHelper2);
+  rectHelper3 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight3);
+  rectLight3.add(rectHelper3);
+  rectHelper4 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight4);
+  rectLight4.add(rectHelper4);
 }
 
 function addCarShadow() {
