@@ -32,9 +32,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+var gsap = require('./TweenMax.min.js');
+
 var container, controls;
 var camera, scene, renderer, left_headlight, right_headlight, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, ftDisplacement, vector, headlight_flare_right, headlight_flare_left, sprite, ftNormal, ftSpecular, tttt, ftSimple, shadowMaterial;
 var shadow = false;
+var car_object = [];
 var setting = {
   camera: {
     initial: [400, 300, 300] // front,and other positions
@@ -129,8 +132,7 @@ function init() {
   var geometry = new THREE.PlaneBufferGeometry(4000, 6000);
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, 0, 900);
-  mesh.rotation.x = -Math.PI * 0.5; // mesh.rotation.z = Math.PI/6;
-
+  mesh.rotation.x = -Math.PI * 0.5;
   mesh.receiveShadow = true; // test target
 
   var material2 = new THREE.MeshPhongMaterial({
@@ -142,24 +144,7 @@ function init() {
   mesh2.position.set(0, 0, 899);
   mesh2.rotation.x = -Math.PI * 0.5;
   mesh2.receiveShadow = true;
-  scene.add(mesh2); // background plane
-  //add env images
-  // addEnv();
-  // load hdri and car object
-  // new EXRLoader()
-  // new RGBELoader()
-  // 	.setDataType( THREE.UnsignedByteType )
-  // 	.setPath( 'dist/env/' )
-  //   .load( 'night_city.hdr', function ( texture ) {
-  //     var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-  // scene.background = envMap;
-  // scene.background = pmremGenerator.renderTarget;
-  // scene.environment = envMap;
-  // texture.dispose();
-  // pmremGenerator.dispose();
-  // render();
-  // var roughnessMipmapper = new RoughnessMipmapper( renderer );
-
+  scene.add(mesh2);
   addBackgroundEnv();
   getCubeMapTexture().then(function (_ref2) {
     var envMap = _ref2.envMap;
@@ -168,7 +153,8 @@ function init() {
     loader.load('final.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
         if (child.isMesh) {
-          // console.log(child)
+          car_object.push(child); // console.log(child)
+
           child.material.envMap = envMap;
           child.material.envMapIntensity = 1;
           child.material.needsUpdate = true;
@@ -424,7 +410,7 @@ var active_sidebar = "";
 function add_eventListener() {
   console.log("listeners added");
   document.querySelector("button").addEventListener("click", function () {
-    return close_sidebar();
+    return close_all();
   }, false);
   document.querySelector("#part_panel").addEventListener("click", function () {
     return open_sidebar('part');
@@ -432,7 +418,11 @@ function add_eventListener() {
   document.querySelector("#color_panel").addEventListener("click", function () {
     return open_sidebar('color');
   }, false);
-}
+  document.querySelectorAll(".color_button").forEach(function (el) {
+    el.addEventListener("click", change_car_paint, false);
+  });
+} // open sidebar
+
 
 function open_sidebar(title) {
   active_sidebar = title;
@@ -447,14 +437,77 @@ function open_sidebar(title) {
 
   document.querySelector("#canvas").classList.add("smaller");
   console.log();
-}
+} // close active sidebar when another is opening
 
-function close_sidebar() {
-  if (active_sidebar == "part") {
+
+function close_sidebar(title) {
+  if (title == "part") {
     document.querySelector(".gui__sidebar--part").style.transform = "translate3d(100%, 0px, 0px)";
   } else {
     document.querySelector(".gui__sidebar--color").style.transform = "translate3d(100%, 0px, 0px)";
   }
+} // only close current active sidebar
 
+
+function close_all() {
+  document.querySelector(".gui__sidebar--".concat(active_sidebar)).style.transform = "translate3d(100%, 0px, 0px)";
   document.querySelector("#canvas").classList.remove("smaller");
+} // change car paint
+
+
+var active_color = "rgb(0,25,105)";
+
+function change_car_paint() {
+  //update active color
+  active_color = this.dataset.color; // change active color icon
+
+  document.querySelector('circle.active').classList.remove("active");
+  document.querySelector("circle.circ_".concat(this.dataset.color_name)).classList.add('active'); // change material color
+  // car_object.filter(part=>{
+  //   return part.material.name == "rang_badane_mashin"
+  // }).forEach(mesh=>{
+  //   mesh.material.needsUpdate = true;          
+  //   // mesh.material.color = new THREE.Color(this.dataset.color)
+  //   colorTo(mesh,color[this.dataset.color_name]);
+  // })
+
+  var body = car_object.filter(function (part) {
+    return part.name == "badane_mashin";
+  })[0];
+  colorTo(body, color[this.dataset.color_name]); // // update environment
+  // render();
+}
+
+var color = {
+  "black": new THREE.MeshBasicMaterial({
+    color: 0x000000
+  }),
+  "blue": new THREE.MeshBasicMaterial({
+    color: 0x001969
+  }),
+  "red": new THREE.MeshBasicMaterial({
+    color: 0xc40000
+  })
+};
+
+function colorTo(target, value) {
+  var target = target;
+  var initial = new THREE.Color(target.material.color.getHex());
+  var value = new THREE.Color(value.color.getHex());
+  TweenLite.to(initial, 1, {
+    r: value.r,
+    g: value.g,
+    b: value.b,
+    onStart: function onStart() {
+      target.material.color = initial;
+      render();
+    },
+    onComplete: function onComplete() {
+      target.material.color = value;
+      render();
+    },
+    onUpdate: function onUpdate() {
+      render();
+    }
+  });
 }

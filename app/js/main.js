@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-
+const gsap = require('./TweenMax.min.js');
 			import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
       import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
@@ -17,7 +17,7 @@ import * as THREE from 'three';
 			var container, controls;
 			var camera, scene, renderer,left_headlight,right_headlight,lightHelper,shadowCameraHelper,mesh_,glitchPass,renderPass,composer,theta,ftDisplacement,vector,headlight_flare_right,headlight_flare_left,sprite,ftNormal,ftSpecular,tttt,ftSimple,shadowMaterial;
       var shadow = false;
-
+      var car_object = [];
 
       let setting={
         camera:{
@@ -127,7 +127,6 @@ import * as THREE from 'three';
         var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, 0, 900 );
         mesh.rotation.x = - Math.PI * 0.5;
-        // mesh.rotation.z = Math.PI/6;
 				mesh.receiveShadow = true;
 
 
@@ -141,149 +140,132 @@ import * as THREE from 'three';
 				mesh2.receiveShadow = true;
         scene.add( mesh2 );
 
-        // background plane
 
-        
-        //add env images
-        // addEnv();
-        // load hdri and car object
-        // new EXRLoader()
-        // new RGBELoader()
-				// 	.setDataType( THREE.UnsignedByteType )
-				// 	.setPath( 'dist/env/' )
-        //   .load( 'night_city.hdr', function ( texture ) {
-        //     var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-            // scene.background = envMap;
-            // scene.background = pmremGenerator.renderTarget;
-						// scene.environment = envMap;
-						// texture.dispose();
-						// pmremGenerator.dispose();
-						// render();
-            // var roughnessMipmapper = new RoughnessMipmapper( renderer );
-            addBackgroundEnv();
-            getCubeMapTexture().then(({ envMap }) => {
-            // scene.background = pmremGenerator.renderTarget; 
-						var loader = new GLTFLoader().setPath( 'dist/' );
-						loader.load( 'final.glb', function ( gltf ) {
-							gltf.scene.traverse( function ( child ) {
-                  if ( child.isMesh ) {
-                    // console.log(child)
+        addBackgroundEnv();
+        getCubeMapTexture().then(({ envMap }) => {
+        // scene.background = pmremGenerator.renderTarget; 
+        var loader = new GLTFLoader().setPath( 'dist/' );
+        loader.load( 'final.glb', function ( gltf ) {
+          gltf.scene.traverse( function ( child ) {
+              if ( child.isMesh ) {
+                car_object.push(child)
+                // console.log(child)
+                child.material.envMap  = envMap;
+                child.material.envMapIntensity =1;
+                child.material.needsUpdate = true;
+                child.castShadow = true; 
+                child.receiveShadow = true;
+                if(child.material.name == "lastic"){
+                  child.material.needsUpdate = true;
+                  child.material.envMap  = null;
+                }
+                if(child.material.name == "rang_badane_mashin"){
+                    child.material.needsUpdate=true;
                     child.material.envMap  = envMap;
                     child.material.envMapIntensity =1;
-                    child.material.needsUpdate = true;
-                    child.castShadow = true; 
-                    child.receiveShadow = true;
-                    if(child.material.name == "lastic"){
-                      child.material.needsUpdate = true;
-                      child.material.envMap  = null;
-                    }
-                    if(child.material.name == "rang_badane_mashin"){
-                        child.material.needsUpdate=true;
-                        child.material.envMap  = envMap;
-                        child.material.envMapIntensity =1;
-                        child.material.metalness=0.02;
-                        child.material.reflectivity=0.05;
-                        child.material.roughness=0.04;
-                        child.material.side=2;  
-                        child.renderOrder=1;
-                        // console.log(child)
-                    }
-
-                    if(child.name == "Shishe_jelo"){
-                        child.material.needsUpdate=true;
-                        child.material.envMap  = envMap;
-                        child.material.envMapIntensity =1;
-                        child.material.metalness=0;
-                        child.material.reflectivity=0.5;
-                        child.material.roughness=0;
-                        child.material.side=2;  
-                        child.material.color=new THREE.Color("rgb(0,0, 0)");
-                    }
-
-                    if(child.name == "shise_cheragh_jelo" && child.material.name=="shishe_cheragh_jelo"){
-                        // console.log(child)
-                        child.material.needsUpdate=true;
-                        child.material.opacity=1;  
-                        child.material.metalness=0;
-                        child.material.reflectivity=1;
-                        child.material.roughness=0;
-                        child.material.transmission=0.9;
-
-                        // add glow left
-                        child.add( headlight_flare_right );
-                        headlight_flare_right.position.z =55;
-                        headlight_flare_right.position.x =125;
-                        headlight_flare_right.position.y =5;
-                        headlight_flare_right.lookAt(camera.position)
-                        child.add(headlight_flare_right)
-
-                        // add glow right
-                        child.add( headlight_flare_left );
-                        headlight_flare_left.position.z =55;
-                        headlight_flare_left.position.x =-125;
-                        headlight_flare_left.position.y =5;
-                        headlight_flare_left.lookAt(camera.position)
-                        child.add(headlight_flare_left)
-
-                        
-                    }
-
-                    if(child.name == "cheragh_rahnama_jelo"){
-                      child.material.needsUpdate=true;
-                      child.material.emissive=new THREE.Color("rgb(255,51, 0)");
-
-                    }
-
-                    if(child.name=="ring"){
-                      child.material.needsUpdate=true;
-                      child.material.color=new THREE.Color("rgb(75,75, 75)");
-                      child.material.roughness = 0.3;
-                      child.material.metalness = 0.6;
-                      child.material.reflectivity = 0.4;
-                    }
-                  }
+                    child.material.metalness=0.02;
+                    child.material.reflectivity=0.05;
+                    child.material.roughness=0.04;
+                    child.material.side=2;  
+                    child.renderOrder=1;
+                    // console.log(child)
                 }
-              );
-              // spotlight
-              const color = 0xFFFFFF;
-              const intensity = 1;
-              const angle = Math.PI/4;
-              const dist = 600;
-              const penumbra = 0.5;
-              //right headlight
-              left_headlight = new THREE.SpotLight(color, intensity);
-              left_headlight.distance = dist;
-              left_headlight.angle = angle;
-              left_headlight.penumbra = penumbra;
-              left_headlight.position.set(-100, 180, 550);
-              left_headlight.target = mesh;
-              left_headlight.target.position.x = -100;
-              // gltf.scene.add(left_headlight);
-              // gltf.scene.add(left_headlight.target);
 
-              //left headlight
-              right_headlight = new THREE.SpotLight(color, intensity);
-              right_headlight.distance = dist;
-              right_headlight.angle = angle;
-              right_headlight.penumbra = penumbra;
-              right_headlight.position.set(100, 180, 550);
-              right_headlight.target = mesh2;
-              right_headlight.target.position.x = 100;
-              // right_headlight.target.position.set(100, 0, -400);
-              // gltf.scene.add(right_headlight);
-              // gltf.scene.add(right_headlight.target);
-              
-              gltf.scene.position.set(0,0,0);
-              scene.add( gltf.scene );
+                if(child.name == "Shishe_jelo"){
+                    child.material.needsUpdate=true;
+                    child.material.envMap  = envMap;
+                    child.material.envMapIntensity =1;
+                    child.material.metalness=0;
+                    child.material.reflectivity=0.5;
+                    child.material.roughness=0;
+                    child.material.side=2;  
+                    child.material.color=new THREE.Color("rgb(0,0, 0)");
+                }
 
-              addCarShadow()
-              shadow=true;
-							// roughnessMipmapper.dispose();
-							render();
-            },function(xhr) {
-              // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-            } );
-          } 
+                if(child.name == "shise_cheragh_jelo" && child.material.name=="shishe_cheragh_jelo"){
+                    // console.log(child)
+                    child.material.needsUpdate=true;
+                    child.material.opacity=1;  
+                    child.material.metalness=0;
+                    child.material.reflectivity=1;
+                    child.material.roughness=0;
+                    child.material.transmission=0.9;
+
+                    // add glow left
+                    child.add( headlight_flare_right );
+                    headlight_flare_right.position.z =55;
+                    headlight_flare_right.position.x =125;
+                    headlight_flare_right.position.y =5;
+                    headlight_flare_right.lookAt(camera.position)
+                    child.add(headlight_flare_right)
+
+                    // add glow right
+                    child.add( headlight_flare_left );
+                    headlight_flare_left.position.z =55;
+                    headlight_flare_left.position.x =-125;
+                    headlight_flare_left.position.y =5;
+                    headlight_flare_left.lookAt(camera.position)
+                    child.add(headlight_flare_left)
+
+                    
+                }
+
+                if(child.name == "cheragh_rahnama_jelo"){
+                  child.material.needsUpdate=true;
+                  child.material.emissive=new THREE.Color("rgb(255,51, 0)");
+
+                }
+
+                if(child.name=="ring"){
+                  child.material.needsUpdate=true;
+                  child.material.color=new THREE.Color("rgb(75,75, 75)");
+                  child.material.roughness = 0.3;
+                  child.material.metalness = 0.6;
+                  child.material.reflectivity = 0.4;
+                }
+              }
+            }
+          );
+          // spotlight
+          const color = 0xFFFFFF;
+          const intensity = 1;
+          const angle = Math.PI/4;
+          const dist = 600;
+          const penumbra = 0.5;
+          //right headlight
+          left_headlight = new THREE.SpotLight(color, intensity);
+          left_headlight.distance = dist;
+          left_headlight.angle = angle;
+          left_headlight.penumbra = penumbra;
+          left_headlight.position.set(-100, 180, 550);
+          left_headlight.target = mesh;
+          left_headlight.target.position.x = -100;
+          // gltf.scene.add(left_headlight);
+          // gltf.scene.add(left_headlight.target);
+
+          //left headlight
+          right_headlight = new THREE.SpotLight(color, intensity);
+          right_headlight.distance = dist;
+          right_headlight.angle = angle;
+          right_headlight.penumbra = penumbra;
+          right_headlight.position.set(100, 180, 550);
+          right_headlight.target = mesh2;
+          right_headlight.target.position.x = 100;
+          // right_headlight.target.position.set(100, 0, -400);
+          // gltf.scene.add(right_headlight);
+          // gltf.scene.add(right_headlight.target);
+          
+          gltf.scene.position.set(0,0,0);
+          scene.add( gltf.scene );
+
+          addCarShadow()
+          shadow=true;
+          // roughnessMipmapper.dispose();
+          render();
+        },function(xhr) {
+          // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        } );
+      } 
         );
 
         // renderer
@@ -461,13 +443,18 @@ import * as THREE from 'three';
 
       // actions for html elements
       let active_sidebar="";
+
       function add_eventListener(){
         console.log("listeners added")
-          document.querySelector("button").addEventListener("click", () =>close_sidebar(), false);
+          document.querySelector("button").addEventListener("click", () =>close_all(), false);
           document.querySelector("#part_panel").addEventListener("click", () =>open_sidebar('part'), false);
           document.querySelector("#color_panel").addEventListener("click", () =>open_sidebar('color'), false);
+          document.querySelectorAll(".color_button").forEach(el=>{
+            el.addEventListener("click", change_car_paint, false);
+          })
       }
 
+      // open sidebar
       function open_sidebar(title){
         active_sidebar = title;
         if(title == "part"){
@@ -482,11 +469,83 @@ import * as THREE from 'three';
         console.log()
       }
 
-      function close_sidebar(){
-        if(active_sidebar == "part"){
+      // close active sidebar when another is opening
+      function close_sidebar(title){
+        if(title == "part"){
           document.querySelector(".gui__sidebar--part").style.transform = "translate3d(100%, 0px, 0px)";
         }else{
           document.querySelector(".gui__sidebar--color").style.transform = "translate3d(100%, 0px, 0px)";
         }
+      }
+
+      // only close current active sidebar
+      function close_all(){
+        document.querySelector(`.gui__sidebar--${active_sidebar}`).style.transform = "translate3d(100%, 0px, 0px)";
         document.querySelector("#canvas").classList.remove("smaller")
+      }
+
+      // change car paint
+      let active_color = "rgb(0,25,105)";
+
+      function change_car_paint(){
+
+        //update active color
+        active_color = this.dataset.color;
+
+        // change active color icon
+        document.querySelector('circle.active').classList.remove("active");
+        document.querySelector(`circle.circ_${this.dataset.color_name}`).classList.add('active');
+        
+        // change material color
+        // car_object.filter(part=>{
+        //   return part.material.name == "rang_badane_mashin"
+        // }).forEach(mesh=>{
+        //   mesh.material.needsUpdate = true;          
+        //   // mesh.material.color = new THREE.Color(this.dataset.color)
+        //   colorTo(mesh,color[this.dataset.color_name]);
+        // })
+
+
+        let body = car_object.filter(part=>{
+          return part.name == "badane_mashin"
+        })[0];
+        colorTo(body,color[this.dataset.color_name]);
+
+        // // update environment
+        // render();
+        
+      }
+
+      var color = {
+        "black": new THREE.MeshBasicMaterial({
+          color: 0x000000
+        }),
+        "blue": new THREE.MeshBasicMaterial({
+          color: 0x001969
+        }),
+        "red": new THREE.MeshBasicMaterial({
+          color: 0xc40000
+        })
+      }
+
+      function colorTo(target, value) {
+        var target = target
+        var initial = new THREE.Color(target.material.color.getHex());
+        var value = new THREE.Color(value.color.getHex());
+        TweenLite.to(initial, 1, {
+          r: value.r,
+          g: value.g,
+          b: value.b,
+          onStart: function(){
+            target.material.color = initial;
+            render()
+          },
+          onComplete: function(){
+            target.material.color = value;
+            render()
+          },
+          onUpdate: function () {
+            render()
+          }
+        });
       }
