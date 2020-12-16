@@ -8,20 +8,6 @@ var _OrbitControls = require("three/examples/jsm/controls/OrbitControls.js");
 
 var _GLTFLoader = require("three/examples/jsm/loaders/GLTFLoader.js");
 
-var _RGBELoader = require("three/examples/jsm/loaders/RGBELoader.js");
-
-var _EXRLoader = require("three/examples/jsm/loaders/EXRLoader.js");
-
-var _RoughnessMipmapper = require("three/examples/jsm/utils/RoughnessMipmapper.js");
-
-var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer.js");
-
-var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass.js");
-
-var _GlitchPass = require("three/examples/jsm/postprocessing/GlitchPass.js");
-
-var _Reflector = require("three/examples/jsm/objects/Reflector");
-
 var _RectAreaLightUniformsLib = require("three/examples/jsm/lights/RectAreaLightUniformsLib.js");
 
 var _RectAreaLightHelper = require("three/examples/jsm/helpers/RectAreaLightHelper.js");
@@ -35,36 +21,41 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var gsap = require('./TweenMax.min.js');
 
 var container, controls;
-var camera, scene, renderer, left_headlight, right_headlight, lightHelper, shadowCameraHelper, mesh_, glitchPass, renderPass, composer, theta, ftDisplacement, vector, headlight_flare_right, headlight_flare_left, sprite, ftNormal, ftSpecular, tttt, ftSimple, shadowMaterial;
+var camera, scene, renderer, left_headlight, right_headlight, ftDisplacement, headlight_flare_right, headlight_flare_left, ftNormal, ftSpecular, ftSimple, shadowMaterial;
 var shadow = false;
 var car_object = [];
 var setting = {
+  color: {
+    "black": new THREE.MeshBasicMaterial({
+      color: 0x000000
+    }),
+    "blue": new THREE.MeshBasicMaterial({
+      color: 0x001969
+    }),
+    "red": new THREE.MeshBasicMaterial({
+      color: 0xc40000
+    })
+  },
   camera: {
-    initial: [400, 300, 300] // front,and other positions
-
+    initial: [400, 300, 300]
   }
 };
 init();
-render(); // animate();
+render();
 
 function init() {
   var _ref;
 
-  // container = document.createElement( 'div' );
-  // document.body.appendChild( container );
   container = document.getElementById('canvas');
   document.body.appendChild(container); // camera
-  // container.offsetWidth,container.offsetHeight
 
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 6000);
   camera.position.set(400, 300, 300); // scene
 
-  scene = new THREE.Scene(); // scene.add( new THREE.AxesHelper(1000));
-  //makes color brighter and stronger
-  // var light = new THREE.AmbientLight( 0x0f0f0f );
+  scene = new THREE.Scene(); //ambient light
 
   var light = new THREE.AmbientLight(0x222222);
-  scene.add(light); // add rect lights to both sides of the car
+  scene.add(light); // add rect lights 
 
   addRectlights(); // hemisphere light
 
@@ -105,23 +96,24 @@ function init() {
   headlight_flare_left.opacity = 0;
   headlight_flare_left.visible = false;
   headlight_flare_left.lookAt(camera.position); // end of headlight flares 
-  // normal
+  // main ground map textures
+  // 1)normal
 
   ftNormal = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_normal.jpg');
   ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping;
-  ftNormal.repeat.set(1, 1); // map
+  ftNormal.repeat.set(1, 1); // 2)main map
 
   ftSimple = new THREE.ImageUtils.loadTexture('dist/env/envSky/ny.jpg');
   ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping;
-  ftSimple.repeat.set(3, 2); // specular
+  ftSimple.repeat.set(3, 2); // 3)specular
 
   ftSpecular = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_Roughness.jpg');
   ftSpecular.wrapS = ftSpecular.wrapT = THREE.RepeatWrapping;
-  ftSpecular.repeat.set(3, 3); // displacement
+  ftSpecular.repeat.set(3, 3); // 4)displacement
 
   ftDisplacement = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_Displacement.jpg');
   ftDisplacement.wrapS = ftDisplacement.wrapT = THREE.RepeatWrapping;
-  ftDisplacement.repeat.set(3, 2); // ground
+  ftDisplacement.repeat.set(3, 2); // main ground
 
   var material = new THREE.MeshBasicMaterial({
     color: 0xffffff,
@@ -133,7 +125,7 @@ function init() {
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(0, 0, 900);
   mesh.rotation.x = -Math.PI * 0.5;
-  mesh.receiveShadow = true; // test target
+  mesh.receiveShadow = true; // plane under main ground for showing reflection of headlight on ground in night mode
 
   var material2 = new THREE.MeshPhongMaterial({
     opacity: 0,
@@ -148,7 +140,7 @@ function init() {
   addBackgroundEnv();
   getCubeMapTexture().then(function (_ref2) {
     var envMap = _ref2.envMap;
-    // scene.background = pmremGenerator.renderTarget; 
+    //load car and set its settings while traversing car object 
     var loader = new _GLTFLoader.GLTFLoader().setPath('dist/');
     loader.load('final.glb', function (gltf) {
       gltf.scene.traverse(function (child) {
@@ -272,9 +264,9 @@ function init() {
   renderer.toneMappingExposure = 1;
   renderer.outputEncoding = THREE.sRGBEncoding; // renderer.shadowMap.enabled = true;
 
-  container.appendChild(renderer.domElement);
-  var pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader(); // orbit controller
+  container.appendChild(renderer.domElement); // let pmremGenerator = new THREE.PMREMGenerator( renderer );
+  // pmremGenerator.compileEquirectangularShader();
+  // orbit controller
 
   controls = new _OrbitControls.OrbitControls(camera, renderer.domElement);
   controls.addEventListener('change', render); // use if there is no animation loop
@@ -292,17 +284,17 @@ function init() {
   window.addEventListener('resize', onWindowResize, false);
   scene.rotation.y = Math.PI / 2;
   add_eventListener();
-}
+} // update scene after windows resized
+
 
 function onWindowResize() {
-  console.log("resize");
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   render();
 }
 
-var euler, rotation, radians, degrees;
+var euler, rotation, radians; // updated scene
 
 function render() {
   renderer.render(scene, camera);
@@ -314,13 +306,12 @@ function render() {
   euler = new THREE.Euler();
   rotation = euler.setFromQuaternion(camera.quaternion);
   radians = rotation.z > 0 ? rotation.z : 2 * Math.PI + rotation.z;
-  degrees = THREE.Math.radToDeg(radians);
 
   if (shadow == true) {
     shadowMaterial.visible = true;
-  } //  console.log(controls.getAzimuthalAngle ())
+  }
+} // add rect lights around the car
 
-}
 
 function addRectlights() {
   var rectLight1, rectLight2, rectLight3, rectLight4, rectHelper1, rectHelper2, rectHelper3, rectHelper4;
@@ -355,7 +346,8 @@ function addRectlights() {
   rectLight3.add(rectHelper3);
   rectHelper4 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight4);
   rectLight4.add(rectHelper4);
-}
+} // add shadow plane under the car object
+
 
 function addCarShadow() {
   // Texture
@@ -377,12 +369,14 @@ function addCarShadow() {
   shadowMesh.position.z = 50;
   shadowMesh.rotation.y = Math.PI / 2;
   scene.add(shadowMesh);
-}
+} // set scene background
+
 
 function addBackgroundEnv() {
   var bg = new THREE.CubeTextureLoader().setPath("dist/env/envSky/").load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
   scene.background = bg; // new THREE.Color(0x333333)
-}
+} // create cube map texture to be reflected on car body
+
 
 function getCubeMapTexture() {
   return new Promise(function (resolve) {
@@ -393,19 +387,8 @@ function getCubeMapTexture() {
       cubeMap: envMap
     });
   });
-} // function updateLight() {
-//   left_headlight.target.updateMatrixWorld();
-//   right_headlight.target.updateMatrixWorld();
-// }
-// function animate() {
-//   requestAnimationFrame( animate );
-//   // composer.render();
-//   renderer.render();
-// }
-// actions for html elements
+} // add listener to elements
 
-
-var active_sidebar = "";
 
 function add_eventListener() {
   console.log("listeners added");
@@ -424,6 +407,8 @@ function add_eventListener() {
 } // open sidebar
 
 
+var active_sidebar = "";
+
 function open_sidebar(title) {
   active_sidebar = title;
 
@@ -435,8 +420,8 @@ function open_sidebar(title) {
     document.querySelector(".gui__sidebar--color").style.transform = "translate3d(0px, 0px, 0px)";
   }
 
-  document.querySelector("#canvas").classList.add("smaller");
-  console.log();
+  document.querySelector("#canvas").classList.add("sidebar_opened");
+  document.querySelector(".gui__footer").classList.add("sidebar_opened");
 } // close active sidebar when another is opening
 
 
@@ -451,50 +436,26 @@ function close_sidebar(title) {
 
 function close_all() {
   document.querySelector(".gui__sidebar--".concat(active_sidebar)).style.transform = "translate3d(100%, 0px, 0px)";
-  document.querySelector("#canvas").classList.remove("smaller");
-} // change car paint
+  document.querySelector("#canvas").classList.remove("sidebar_opened");
+  document.querySelector(".gui__footer").classList.remove("sidebar_opened");
+} //change car paint color
 
-
-var active_color = "rgb(0,25,105)";
 
 function change_car_paint() {
-  //update active color
-  active_color = this.dataset.color; // change active color icon
-
   document.querySelector('circle.active').classList.remove("active");
-  document.querySelector("circle.circ_".concat(this.dataset.color_name)).classList.add('active'); // change material color
-  // car_object.filter(part=>{
-  //   return part.material.name == "rang_badane_mashin"
-  // }).forEach(mesh=>{
-  //   mesh.material.needsUpdate = true;          
-  //   // mesh.material.color = new THREE.Color(this.dataset.color)
-  //   colorTo(mesh,color[this.dataset.color_name]);
-  // })
-
+  document.querySelector("circle.circ_".concat(this.dataset.color_name)).classList.add('active');
   var body = car_object.filter(function (part) {
     return part.name == "badane_mashin";
   })[0];
-  colorTo(body, color[this.dataset.color_name]); // // update environment
-  // render();
-}
+  colorTo(body, setting.color[this.dataset.color_name]);
+} // change material color with a transition
 
-var color = {
-  "black": new THREE.MeshBasicMaterial({
-    color: 0x000000
-  }),
-  "blue": new THREE.MeshBasicMaterial({
-    color: 0x001969
-  }),
-  "red": new THREE.MeshBasicMaterial({
-    color: 0xc40000
-  })
-};
 
-function colorTo(target, value) {
-  var target = target;
+function colorTo(meshBody, newColor) {
+  var target = meshBody;
   var initial = new THREE.Color(target.material.color.getHex());
-  var value = new THREE.Color(value.color.getHex());
-  TweenLite.to(initial, 1, {
+  var value = new THREE.Color(newColor.color.getHex());
+  TweenLite.to(initial, 0.5, {
     r: value.r,
     g: value.g,
     b: value.b,
