@@ -116,7 +116,7 @@
         ftDisplacement.repeat.set(3,2);
         
         // main ground
-        let material = new THREE.MeshBasicMaterial( { color: 0xffffff, dithering: true,map:ftSimple,visible:false} );
+        let material = new THREE.MeshBasicMaterial( { color: 0xffffff, dithering: true,map:ftSimple,visible:true} );
 				let geometry = new THREE.PlaneBufferGeometry( 4000, 6000 );
         let mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, 0, 900 );
@@ -365,7 +365,7 @@
       // add shadow plane under the car object
       function addCarShadow(){
          // Texture
-         const shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.jpg");
+         const shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.png");
 
          // Plane
          const shadowPlane = new THREE.PlaneBufferGeometry(1200, 1200);
@@ -375,10 +375,8 @@
          // Material
          shadowMaterial = new THREE.MeshBasicMaterial({
              map: shadowTexture,
-             blending: THREE.MultiplyBlending,
              transparent: true,
-             opacity:0,
-             visible: false
+             opacity:0.8,
          });
  
          // Mesh
@@ -387,6 +385,7 @@
          shadowMesh.position.z = 50;
          shadowMesh.rotation.y = Math.PI / 2;
          scene.add(shadowMesh);
+         console.log(shadowMesh)
       }
 
       // set scene background

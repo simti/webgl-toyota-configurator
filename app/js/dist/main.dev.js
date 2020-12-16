@@ -119,7 +119,7 @@ function init() {
     color: 0xffffff,
     dithering: true,
     map: ftSimple,
-    visible: false
+    visible: true
   });
   var geometry = new THREE.PlaneBufferGeometry(4000, 6000);
   var mesh = new THREE.Mesh(geometry, material);
@@ -351,17 +351,15 @@ function addRectlights() {
 
 function addCarShadow() {
   // Texture
-  var shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.jpg"); // Plane
+  var shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.png"); // Plane
 
   var shadowPlane = new THREE.PlaneBufferGeometry(1200, 1200);
   shadowPlane.rotateX(-Math.PI / 2); // Material
 
   shadowMaterial = new THREE.MeshBasicMaterial({
     map: shadowTexture,
-    blending: THREE.MultiplyBlending,
     transparent: true,
-    opacity: 0,
-    visible: false
+    opacity: 0.8
   }); // Mesh
 
   var shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
@@ -369,6 +367,7 @@ function addCarShadow() {
   shadowMesh.position.z = 50;
   shadowMesh.rotation.y = Math.PI / 2;
   scene.add(shadowMesh);
+  console.log(shadowMesh);
 } // set scene background
 
 
