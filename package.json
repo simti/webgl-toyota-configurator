@@ -13,6 +13,7 @@
         "babel-core": "^6.26.3",
         "babel-loader": "^8.1.0",
         "babel-preset-env": "^1.7.0",
+        "gsap": "^3.5.1",
         "jquery": "^3.4.1",
         "three": "^0.119.1",
         "uglifyjs-webpack-plugin": "^2.2.0",

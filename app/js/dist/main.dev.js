@@ -16,9 +16,13 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var gsap = require('./TweenMax.min.js');
+require('./TweenMax.min.js');
 
 var container, controls;
 var camera, scene, renderer, left_headlight, right_headlight, ftDisplacement, headlight_flare_right, headlight_flare_left, ftNormal, ftSpecular, ftSimple, shadowMaterial;
@@ -37,7 +41,17 @@ var setting = {
     })
   },
   camera: {
-    initial: [400, 300, 300]
+    first_look: {
+      x: 400,
+      y: 300,
+      z: 300
+    },
+    rear_lighting: {
+      x: -984,
+      y: 174,
+      z: 35,
+      duration: 2
+    }
   }
 };
 init();
@@ -49,8 +63,9 @@ function init() {
   container = document.getElementById('canvas');
   document.body.appendChild(container); // camera
 
+  var camera_init = setting.camera.first_look;
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 6000);
-  camera.position.set(400, 300, 300); // scene
+  camera.position.set(camera_init.x, camera_init.y, camera_init.z); // scene
 
   scene = new THREE.Scene(); //ambient light
 
@@ -98,45 +113,37 @@ function init() {
   headlight_flare_left.lookAt(camera.position); // end of headlight flares 
   // main ground map textures
   // 1)normal
+  // ftNormal = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_normal.jpg' );
+  // ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping; 
+  // ftNormal.repeat.set( 1, 1);
+  // 2)main map
+  // ftSimple = new THREE.ImageUtils.loadTexture( 'dist/env/envSky/ny.jpg' );
+  // ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping; 
+  // ftSimple.repeat.set( 3, 2 );
+  // 3)specular
+  // ftSpecular = new THREE.ImageUtils.loadTexture( 'dist/textures/uiglegfg_2K_Roughness.jpg' );
+  // ftSpecular.wrapS = ftSpecular.wrapT = THREE.RepeatWrapping; 
+  // ftSpecular.repeat.set( 3, 3 );
+  // 4)displacement
+  // ftDisplacement = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_Displacement.jpg');
+  // ftDisplacement.wrapS = ftDisplacement.wrapT = THREE.RepeatWrapping;
+  // ftDisplacement.repeat.set(3,2);
+  // main ground
+  // let material = new THREE.MeshBasicMaterial( { color: 0xffffff, dithering: true,map:ftSimple,visible:true} );
+  // let geometry = new THREE.PlaneBufferGeometry( 4000, 6000 );
+  // let mesh = new THREE.Mesh( geometry, material );
+  // mesh.position.set( 0, 0, 900 );
+  // mesh.rotation.x = - Math.PI * 0.5;
+  // mesh.receiveShadow = true;
+  // plane under main ground for showing reflection of headlight on ground in night mode
+  // let material2 = new THREE.MeshPhongMaterial({opacity:0,visible:false});
+  // let geometry2= new THREE.PlaneBufferGeometry( 4000, 6000 );
+  // let mesh2 = new THREE.Mesh( geometry2, material2 );
+  // mesh2.position.set( 0, 0, 899 );
+  // mesh2.rotation.x = - Math.PI * 0.5;
+  // mesh2.receiveShadow = true;
+  // scene.add( mesh2 );
 
-  ftNormal = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_normal.jpg');
-  ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping;
-  ftNormal.repeat.set(1, 1); // 2)main map
-
-  ftSimple = new THREE.ImageUtils.loadTexture('dist/env/envSky/ny.jpg');
-  ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping;
-  ftSimple.repeat.set(3, 2); // 3)specular
-
-  ftSpecular = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_Roughness.jpg');
-  ftSpecular.wrapS = ftSpecular.wrapT = THREE.RepeatWrapping;
-  ftSpecular.repeat.set(3, 3); // 4)displacement
-
-  ftDisplacement = new THREE.ImageUtils.loadTexture('dist/textures/uiglegfg_2K_Displacement.jpg');
-  ftDisplacement.wrapS = ftDisplacement.wrapT = THREE.RepeatWrapping;
-  ftDisplacement.repeat.set(3, 2); // main ground
-
-  var material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    dithering: true,
-    map: ftSimple,
-    visible: true
-  });
-  var geometry = new THREE.PlaneBufferGeometry(4000, 6000);
-  var mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(0, 0, 900);
-  mesh.rotation.x = -Math.PI * 0.5;
-  mesh.receiveShadow = true; // plane under main ground for showing reflection of headlight on ground in night mode
-
-  var material2 = new THREE.MeshPhongMaterial({
-    opacity: 0,
-    visible: false
-  });
-  var geometry2 = new THREE.PlaneBufferGeometry(4000, 6000);
-  var mesh2 = new THREE.Mesh(geometry2, material2);
-  mesh2.position.set(0, 0, 899);
-  mesh2.rotation.x = -Math.PI * 0.5;
-  mesh2.receiveShadow = true;
-  scene.add(mesh2);
   addBackgroundEnv();
   getCubeMapTexture().then(function (_ref2) {
     var envMap = _ref2.envMap;
@@ -224,24 +231,24 @@ function init() {
       var angle = Math.PI / 4;
       var dist = 600;
       var penumbra = 0.5; //right headlight
-
-      left_headlight = new THREE.SpotLight(color, intensity);
-      left_headlight.distance = dist;
-      left_headlight.angle = angle;
-      left_headlight.penumbra = penumbra;
-      left_headlight.position.set(-100, 180, 550);
-      left_headlight.target = mesh;
-      left_headlight.target.position.x = -100; // gltf.scene.add(left_headlight);
+      // left_headlight = new THREE.SpotLight(color, intensity);
+      // left_headlight.distance = dist;
+      // left_headlight.angle = angle;
+      // left_headlight.penumbra = penumbra;
+      // left_headlight.position.set(-100, 180, 550);
+      // left_headlight.target = mesh;
+      // left_headlight.target.position.x = -100;
+      // gltf.scene.add(left_headlight);
       // gltf.scene.add(left_headlight.target);
       //left headlight
-
-      right_headlight = new THREE.SpotLight(color, intensity);
-      right_headlight.distance = dist;
-      right_headlight.angle = angle;
-      right_headlight.penumbra = penumbra;
-      right_headlight.position.set(100, 180, 550);
-      right_headlight.target = mesh2;
-      right_headlight.target.position.x = 100; // right_headlight.target.position.set(100, 0, -400);
+      // right_headlight = new THREE.SpotLight(color, intensity);
+      // right_headlight.distance = dist;
+      // right_headlight.angle = angle;
+      // right_headlight.penumbra = penumbra;
+      // right_headlight.position.set(100, 180, 550);
+      // right_headlight.target = mesh2;
+      // right_headlight.target.position.x = 100;
+      // right_headlight.target.position.set(100, 0, -400);
       // gltf.scene.add(right_headlight);
       // gltf.scene.add(right_headlight.target);
 
@@ -309,7 +316,8 @@ function render() {
 
   if (shadow == true) {
     shadowMaterial.visible = true;
-  }
+  } //  console.log(camera.position)
+
 } // add rect lights around the car
 
 
@@ -366,8 +374,7 @@ function addCarShadow() {
   shadowMesh.position.y = 1;
   shadowMesh.position.z = 50;
   shadowMesh.rotation.y = Math.PI / 2;
-  scene.add(shadowMesh);
-  console.log(shadowMesh);
+  scene.add(shadowMesh); //  console.log(shadowMesh)
 } // set scene background
 
 
@@ -390,7 +397,7 @@ function getCubeMapTexture() {
 
 
 function add_eventListener() {
-  console.log("listeners added");
+  // console.log("listeners added")
   document.querySelector("button").addEventListener("click", function () {
     return close_all();
   }, false);
@@ -403,6 +410,9 @@ function add_eventListener() {
   document.querySelectorAll(".color_button").forEach(function (el) {
     el.addEventListener("click", change_car_paint, false);
   });
+  document.querySelector("#rear_light").addEventListener("click", function () {
+    return change_view('rear_light');
+  }, false);
 } // open sidebar
 
 
@@ -470,4 +480,77 @@ function colorTo(meshBody, newColor) {
       render();
     }
   });
+} // update camera position
+
+
+function change_view(view_name) {
+  switch (view_name) {
+    case 'rear_light':
+      updateCameraPositon(setting.camera.rear_lighting);
+      break;
+
+    case 'head_light':
+      // console.log("head light")
+      break;
+
+    default: // console.log("free view")
+
+  }
+}
+
+function updateCameraPositon(position, _options) {
+  var gsap = require("gsap").gsap;
+
+  var x = position.x;
+  var y = position.y;
+  var z = position.z;
+  var duration = 2;
+  gsap.to(camera.position, _objectSpread({
+    x: x,
+    y: y,
+    z: z,
+    duration: duration,
+    ease: "circ.out",
+    // ease: CustomEase.create("custom", "M0,0 C0.33,0 0.427,0.338 0.5,0.5 0.572,0.66 0.698,1 1,1 "),
+    onUpdate: function onUpdate() {
+      controls.update();
+      render();
+    },
+    onComplete: function onComplete() {
+      camera.updateProjectionMatrix();
+
+      if (!controls.enabled) {
+        controls.enabled = true;
+        controls.update();
+      }
+
+      render();
+    }
+  }, _options)); // TweenLite.to(camera.position,position.duration, {
+  //     x,
+  //     y,
+  //     z,
+  //     onStart: function(){
+  //         controls.update();
+  //         render()
+  //         // if (controls.enabled) {
+  //         //     this.controls.enabled = false;
+  //         //     this.controls.update();
+  //         // }
+  //     },
+  //     onComplete: function(){
+  //         camera.updateProjectionMatrix();
+  //         render()
+  //         controls.update();
+  //         // if (!this.controls.enabled) {
+  //         //     this.controls.enabled = true;
+  //         //     this.controls.update();
+  //         // }
+  //     },
+  //     onUpdate: function () {
+  //       console.log(camera.position)
+  //       render()
+  //     },
+  //     ..._options
+  // })
 }
