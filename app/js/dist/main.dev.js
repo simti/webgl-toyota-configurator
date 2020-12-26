@@ -46,10 +46,34 @@ var setting = {
       y: 300,
       z: 300
     },
-    rear_lighting: {
+    rear_light: {
       x: -984,
       y: 174,
       z: 35,
+      duration: 3
+    },
+    head_light: {
+      x: 400,
+      y: 20,
+      z: 350,
+      duration: 3
+    },
+    sunroof: {
+      x: 0,
+      y: 300,
+      z: 0,
+      duration: 3
+    },
+    wheel_rings: {
+      x: -384,
+      y: 0,
+      z: 300,
+      duration: 3
+    },
+    free_view: {
+      x: 400,
+      y: 300,
+      z: 300,
       duration: 2
     }
   }
@@ -72,7 +96,8 @@ function init() {
   var light = new THREE.AmbientLight(0x222222);
   scene.add(light); // add rect lights 
 
-  addRectlights(); // hemisphere light
+  addRectlights();
+  addCarShadow(); // hemisphere light
 
   var hemisphere_light = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.7);
   scene.add(hemisphere_light); // headlight flares
@@ -289,7 +314,8 @@ function init() {
 
   controls.update();
   window.addEventListener('resize', onWindowResize, false);
-  scene.rotation.y = Math.PI / 2;
+  scene.rotation.y = Math.PI / 2; // Grid(scene)
+
   add_eventListener();
 } // update scene after windows resized
 
@@ -413,6 +439,18 @@ function add_eventListener() {
   document.querySelector("#rear_light").addEventListener("click", function () {
     return change_view('rear_light');
   }, false);
+  document.querySelector("#head_light").addEventListener("click", function () {
+    return change_view('front_light');
+  }, false);
+  document.querySelector("#sunroof").addEventListener("click", function () {
+    return change_view('sunroof');
+  }, false);
+  document.querySelector("#wheel_rings").addEventListener("click", function () {
+    return change_view('wheel_rings');
+  }, false);
+  document.querySelector("#free_view").addEventListener("click", function () {
+    return change_view('free_view');
+  }, false);
 } // open sidebar
 
 
@@ -486,11 +524,23 @@ function colorTo(meshBody, newColor) {
 function change_view(view_name) {
   switch (view_name) {
     case 'rear_light':
-      updateCameraPositon(setting.camera.rear_lighting);
+      updateCameraPositon(setting.camera.rear_light);
       break;
 
-    case 'head_light':
-      // console.log("head light")
+    case 'front_light':
+      updateCameraPositon(setting.camera.head_light);
+      break;
+
+    case 'sunroof':
+      updateCameraPositon(setting.camera.sunroof);
+      break;
+
+    case 'wheel_rings':
+      updateCameraPositon(setting.camera.wheel_rings);
+      break;
+
+    case 'free_view':
+      updateCameraPositon(setting.camera.free_view);
       break;
 
     default: // console.log("free view")
@@ -504,7 +554,7 @@ function updateCameraPositon(position, _options) {
   var x = position.x;
   var y = position.y;
   var z = position.z;
-  var duration = 2;
+  var duration = position.duration;
   gsap.to(camera.position, _objectSpread({
     x: x,
     y: y,
@@ -553,4 +603,55 @@ function updateCameraPositon(position, _options) {
   //     },
   //     ..._options
   // })
-}
+} //19 
+// var fShader = "precision highp float;\n\n#define COUNT 20.0\n#define MAX_SCALE 3.0\n\nuniform sampler2D led;\n\nvarying vec2 vUv;\nvarying vec2 vOrigin;\n\nfloat normFloat(float n, float minVal, float maxVal){\n\treturn max(0.0, min(1.0, (n-minVal) / (maxVal-minVal)));\n}\n\nvoid main() {\n\t// Brightness fades away from center\n\tfloat brightness = distance(vUv, vec2(0.5));\n\tbrightness = normFloat(brightness, 0.5, 0.0);\n\n\t// Scale is a function of brightness [0 - 3.0]\n\tfloat scale = (brightness * brightness) * MAX_SCALE;\n\tfloat invScale = (1.0 / scale);\n\tfloat halfInvScale = (invScale - 1.0) / 2.0;\n\n\t// Multiply for count, abs(-0.5) for zig-zag\n\tvec2 newUV = abs(fract((vUv + vOrigin) * COUNT) - 0.5) * 2.0;\n\n\t// Scale up and clamp edges for padding\n\tnewUV = clamp((newUV * invScale) - halfInvScale, 0.0, 1.0);\n\n\tfloat texColor = texture2D(led, newUV).a * 0.15 * brightness;\n\tgl_FragColor = 1.0 - vec4(texColor, texColor, texColor, 0.0);\n}\n"
+//20
+// var vShader = "precision highp float;\n\nfloat normFloat(float n, float minVal, float maxVal){\n\treturn max(0.0, min(1.0, (n-minVal) / (maxVal-minVal)));\n}\n\nuniform vec3 cameraPosition;\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\nuniform vec2 origin;\n\nattribute vec2 uv;\nattribute vec3 position;\n\nvarying vec2 vUv;\nvarying vec2 vOrigin;\n\nvoid main() {\n\tvUv = uv;\n\tvOrigin = origin * 0.1;\n \tvec4 realPos = modelMatrix * vec4(position, 1.0);\n\n\tgl_Position = projectionMatrix * viewMatrix * realPos;\n}"
+// function Grid(scene) {
+//   var mouseActual = new THREE.Vector2(-0.2, 0.3);
+//   var mouseTarget = new THREE.Vector2(THREE.Math.randInt(-40, 40), THREE.Math.randInt(-40, 40));
+//   var tempVec = new THREE.Vector2();
+//   // Define material
+//   var sprite = new THREE.TextureLoader().load("dist/textures/led.png");
+//   var shaderMat = new THREE.RawShaderMaterial({
+//       uniforms: {
+//           color: { value: new THREE.Color(0xffffff) },
+//           texture: { value: sprite },
+//           vpH: { value: window.innerHeight },
+//           time: { value: 0 },
+//           mousePos: { value:  mouseActual },
+//           playhead: { value: 0 }
+//       },
+//       vertexShader: vShader,
+//       fragmentShader: fShader,
+//       blending: THREE.AdditiveBlending,
+//       transparent: true,
+//       depthTest: false
+//   });
+//   var uniformVPH = shaderMat.uniforms.vpH;
+//   var uniformTime =  shaderMat.uniforms.time;
+//   var uniformMouse = shaderMat.uniforms.mousePos;
+//   var uniformPlay =  shaderMat.uniforms.playhead;
+//   // Define buffergeometry
+//   var i3 = 0;
+//   var width = 1000;
+//   var height = 1000;
+//   var vertCount = width * height;
+//   var bufferGeom = new THREE.BufferGeometry();
+//   var allPos = new Float32Array(vertCount * 3);
+//   for (var x = 0; x < width; x++) {
+//       for (var y = 0; y < height; y++, i3 += 3) {
+//           allPos[i3 + 0] = (x - Math.round(width / 2));
+//           allPos[i3 + 1] = (y - Math.round(height / 2));
+//           //  allPos[i3 + 2] = 0;
+//       }
+//   }
+//   bufferGeom.setAttribute("position", new THREE.BufferAttribute(allPos, 3));
+//   var pointsObject = new THREE.Points(bufferGeom, shaderMat);
+//   // pointsObject.scale.set(0.125, 0.125, 0.125);
+//   // pointsObject.position.z = -0.5;
+//   pointsObject.position.y = 100;
+//   pointsObject.position.z = 50;
+//   // pointsObject.rotation.y = Math.PI / 2;
+//   scene.add(pointsObject);
+// }
