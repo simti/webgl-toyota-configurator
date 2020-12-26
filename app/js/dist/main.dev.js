@@ -28,6 +28,9 @@ var container, controls;
 var camera, scene, renderer, left_headlight, right_headlight, ftDisplacement, headlight_flare_right, headlight_flare_left, ftNormal, ftSpecular, ftSimple, shadowMaterial;
 var shadow = false;
 var car_object = [];
+var shadowTexture = new THREE.TextureLoader().load("dist/textures/test.png");
+shadowTexture.wrapS = shadowTexture.wrapT = THREE.RepeatWrapping;
+shadowTexture.repeat.set(2, 2);
 var setting = {
   color: {
     "black": new THREE.MeshBasicMaterial({
@@ -79,7 +82,7 @@ var setting = {
   }
 };
 init();
-render();
+animate();
 
 function init() {
   var _ref;
@@ -142,7 +145,7 @@ function init() {
   // ftNormal.wrapS = ftNormal.wrapT = THREE.RepeatWrapping; 
   // ftNormal.repeat.set( 1, 1);
   // 2)main map
-  // ftSimple = new THREE.ImageUtils.loadTexture( 'dist/env/envSky/ny.jpg' );
+  // ftSimple = new THREE.ImageUtils.loadTexture( 'dist/textures/test.png' );
   // ftSimple.wrapS = ftSimple.wrapT = THREE.RepeatWrapping; 
   // ftSimple.repeat.set( 3, 2 );
   // 3)specular
@@ -155,9 +158,9 @@ function init() {
   // ftDisplacement.repeat.set(3,2);
   // main ground
   // let material = new THREE.MeshBasicMaterial( { color: 0xffffff, dithering: true,map:ftSimple,visible:true} );
-  // let geometry = new THREE.PlaneBufferGeometry( 4000, 6000 );
+  // let geometry = new THREE.PlaneBufferGeometry( 1200, 1200 );
   // let mesh = new THREE.Mesh( geometry, material );
-  // mesh.position.set( 0, 0, 900 );
+  // mesh.position.set( 0, 1, 900 );
   // mesh.rotation.x = - Math.PI * 0.5;
   // mesh.receiveShadow = true;
   // plane under main ground for showing reflection of headlight on ground in night mode
@@ -330,22 +333,49 @@ function onWindowResize() {
 var euler, rotation, radians; // updated scene
 
 function render() {
-  renderer.render(scene, camera);
-  headlight_flare_right.lookAt(camera.position);
-  headlight_flare_left.lookAt(camera.position); // vector = camera.getWorldDirection();
-  // theta = Math.atan2(vector.x,vector.z);
-  // console.log(theta);
+  // headlight_flare_right.lookAt(camera.position);
+  // headlight_flare_left.lookAt(camera.position);
+  // euler = new THREE.Euler();
+  // rotation = euler.setFromQuaternion(camera.quaternion);
+  // radians = rotation.z > 0
+  //   ? rotation.z
+  //   : (2 * Math.PI) + rotation.z;
+  //  if(shadow == true){
+  //    shadowMaterial.visible = true;
+  //  }
+  renderer.render(scene, camera); //  console.log(camera.position)
+}
 
-  euler = new THREE.Euler();
-  rotation = euler.setFromQuaternion(camera.quaternion);
-  radians = rotation.z > 0 ? rotation.z : 2 * Math.PI + rotation.z;
+function animate() {
+  requestAnimationFrame(animate);
+  shadowTexture.offset.x -= 0.003;
 
-  if (shadow == true) {
-    shadowMaterial.visible = true;
-  } //  console.log(camera.position)
+  if (car_object.length > 0) {
+    var LF = car_object.filter(function (object) {
+      return object.name === "lastic";
+    })[0];
+    var RF = car_object.filter(function (object) {
+      return object.name === "lastic";
+    })[1];
+    var LB = car_object.filter(function (object) {
+      return object.name === "lastic1";
+    })[0];
+    var RB = car_object.filter(function (object) {
+      return object.name === "lastic1";
+    })[1];
+    LF.parent.rotation.x += 0.05;
+    RF.parent.rotation.x += 0.05;
+    LB.parent.rotation.x += 0.05;
+    RB.parent.rotation.x += 0.05; // car_object.filter((object) => object.name === "Lastic")[0].parent.rotation.x-=0.003;
+    // car_object.filter((object) => object.name === "Lastic")[1].parent.rotation.x-=0.003;
+    // car_object.filter((object) => object.name === "Lastic1")[2].parent.rotation.x-=0.003;
+    // car_object.filter((object) => object.name === "Lastic1")[3].parent.rotation.x-=0.003;
+  }
 
-} // add rect lights around the car
+  render();
+}
 
+; // add rect lights around the car
 
 function addRectlights() {
   var rectLight1, rectLight2, rectLight3, rectLight4, rectHelper1, rectHelper2, rectHelper3, rectHelper4;
@@ -371,35 +401,34 @@ function addRectlights() {
   rectLight4 = new THREE.RectAreaLight(0xffffff, 15, 800, 300);
   rectLight4.position.set(1200, 100, 800);
   rectLight4.rotateY(THREE.Math.degToRad(90));
-  scene.add(rectLight4);
-  rectHelper1 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight1);
-  rectLight1.add(rectHelper1);
-  rectHelper2 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight2);
-  rectLight2.add(rectHelper2);
-  rectHelper3 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight3);
-  rectLight3.add(rectHelper3);
-  rectHelper4 = new _RectAreaLightHelper.RectAreaLightHelper(rectLight4);
-  rectLight4.add(rectHelper4);
+  scene.add(rectLight4); // rectHelper1 = new RectAreaLightHelper(rectLight1);
+  // rectLight1.add(rectHelper1);
+  // rectHelper2 = new RectAreaLightHelper(rectLight2);
+  // rectLight2.add(rectHelper2);
+  // rectHelper3 = new RectAreaLightHelper(rectLight3);
+  // rectLight3.add(rectHelper3);
+  // rectHelper4 = new RectAreaLightHelper(rectLight4);
+  // rectLight4.add(rectHelper4);
 } // add shadow plane under the car object
 
 
 function addCarShadow() {
   // Texture
-  var shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.png"); // Plane
-
-  var shadowPlane = new THREE.PlaneBufferGeometry(1200, 1200);
+  // Plane
+  var shadowPlane = new THREE.PlaneBufferGeometry(5000, 5000, 1, 1);
   shadowPlane.rotateX(-Math.PI / 2); // Material
 
-  shadowMaterial = new THREE.MeshBasicMaterial({
+  shadowMaterial = new THREE.MeshLambertMaterial({
     map: shadowTexture,
     transparent: true,
-    opacity: 0.8
+    opacity: 0.5
   }); // Mesh
 
   var shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
   shadowMesh.position.y = 1;
   shadowMesh.position.z = 50;
   shadowMesh.rotation.y = Math.PI / 2;
+  shadowMesh.receiveShadow = true;
   scene.add(shadowMesh); //  console.log(shadowMesh)
 } // set scene background
 
@@ -576,33 +605,7 @@ function updateCameraPositon(position, _options) {
 
       render();
     }
-  }, _options)); // TweenLite.to(camera.position,position.duration, {
-  //     x,
-  //     y,
-  //     z,
-  //     onStart: function(){
-  //         controls.update();
-  //         render()
-  //         // if (controls.enabled) {
-  //         //     this.controls.enabled = false;
-  //         //     this.controls.update();
-  //         // }
-  //     },
-  //     onComplete: function(){
-  //         camera.updateProjectionMatrix();
-  //         render()
-  //         controls.update();
-  //         // if (!this.controls.enabled) {
-  //         //     this.controls.enabled = true;
-  //         //     this.controls.update();
-  //         // }
-  //     },
-  //     onUpdate: function () {
-  //       console.log(camera.position)
-  //       render()
-  //     },
-  //     ..._options
-  // })
+  }, _options));
 } //19 
 // var fShader = "precision highp float;\n\n#define COUNT 20.0\n#define MAX_SCALE 3.0\n\nuniform sampler2D led;\n\nvarying vec2 vUv;\nvarying vec2 vOrigin;\n\nfloat normFloat(float n, float minVal, float maxVal){\n\treturn max(0.0, min(1.0, (n-minVal) / (maxVal-minVal)));\n}\n\nvoid main() {\n\t// Brightness fades away from center\n\tfloat brightness = distance(vUv, vec2(0.5));\n\tbrightness = normFloat(brightness, 0.5, 0.0);\n\n\t// Scale is a function of brightness [0 - 3.0]\n\tfloat scale = (brightness * brightness) * MAX_SCALE;\n\tfloat invScale = (1.0 / scale);\n\tfloat halfInvScale = (invScale - 1.0) / 2.0;\n\n\t// Multiply for count, abs(-0.5) for zig-zag\n\tvec2 newUV = abs(fract((vUv + vOrigin) * COUNT) - 0.5) * 2.0;\n\n\t// Scale up and clamp edges for padding\n\tnewUV = clamp((newUV * invScale) - halfInvScale, 0.0, 1.0);\n\n\tfloat texColor = texture2D(led, newUV).a * 0.15 * brightness;\n\tgl_FragColor = 1.0 - vec4(texColor, texColor, texColor, 0.0);\n}\n"
 //20

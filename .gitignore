@@ -5,4 +5,3 @@ npm-debug.log
 .DS_Store
 app/js/dist
 dist/bundle.js
-
