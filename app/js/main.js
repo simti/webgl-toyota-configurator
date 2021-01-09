@@ -7,12 +7,13 @@
       import {RectAreaLightHelper} from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
 
 			let container, controls;
-			let camera, scene, renderer,left_headlight,right_headlight,ftDisplacement,headlight_flare_right,headlight_flare_left,ftNormal,ftSpecular,ftSimple,shadowMaterial;
+			let camera, scene, renderer,left_headlight,right_headlight,ftDisplacement,headlight_flare_right,headlight_flare_left,ftNormal,ftSpecular,ftSimple,shadowMaterial,groundMaterial;
       let shadow = false;
       let car_object = [];
-      const shadowTexture = new THREE.TextureLoader().load("dist/textures/test.png");
-      shadowTexture.wrapS = shadowTexture.wrapT = THREE.RepeatWrapping;
-      shadowTexture.repeat.set(2, 2);
+      const shadowTexture = new THREE.TextureLoader().load("dist/textures/shadow.png");
+      const groundTexture = new THREE.TextureLoader().load("dist/textures/test.png");
+      groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+      groundTexture.repeat.set(2, 2);
 
       let setting={
         color:{
@@ -68,7 +69,7 @@
       
 
 			init();
-      animate();
+      render();
 
 			function init() {
 
@@ -91,7 +92,7 @@
         // add rect lights 
         addRectlights();
 
-        addCarShadow()
+        addGroundTexture()
         // hemisphere light
         const hemisphere_light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 0.7 );
         scene.add( hemisphere_light );
@@ -216,7 +217,7 @@
                 }
 
                 if(child.name == "shise_cheragh_jelo" && child.material.name=="shishe_cheragh_jelo"){
-                    // console.log(child)
+                    console.log(child)
                     child.material.needsUpdate=true;
                     child.material.opacity=1;  
                     child.material.metalness=0;
@@ -363,25 +364,25 @@
       }
 
 
-      function animate () {
-        requestAnimationFrame( animate );
-        shadowTexture.offset.x -= 0.003;
-        if(car_object.length>0){
-          const LF = car_object.filter((object) => object.name === "lastic")[0];
-          const RF = car_object.filter((object) => object.name === "lastic")[1];
-          const LB = car_object.filter((object) => object.name === "lastic1")[0];
-          const RB = car_object.filter((object) => object.name === "lastic1")[1];
-          LF.parent.rotation.x+=0.05;
-          RF.parent.rotation.x+=0.05;
-          LB.parent.rotation.x+=0.05;
-          RB.parent.rotation.x+=0.05;
+      // function animate () {
+        // requestAnimationFrame( animate );
+        // groundTexture.offset.x -= 0.003;
+        // if(car_object.length>0){
+        //   const LF = car_object.filter((object) => object.name === "lastic")[0];
+        //   const RF = car_object.filter((object) => object.name === "lastic")[1];
+        //   const LB = car_object.filter((object) => object.name === "lastic1")[0];
+        //   const RB = car_object.filter((object) => object.name === "lastic1")[1];
+        //   LF.parent.rotation.x+=0.05;
+        //   RF.parent.rotation.x+=0.05;
+        //   LB.parent.rotation.x+=0.05;
+        //   RB.parent.rotation.x+=0.05;
           // car_object.filter((object) => object.name === "Lastic")[0].parent.rotation.x-=0.003;
           // car_object.filter((object) => object.name === "Lastic")[1].parent.rotation.x-=0.003;
           // car_object.filter((object) => object.name === "Lastic1")[2].parent.rotation.x-=0.003;
           // car_object.filter((object) => object.name === "Lastic1")[3].parent.rotation.x-=0.003;
-        }
-        render()
-      };
+        // }
+        // render()
+      // };
 
       // add rect lights around the car
       function addRectlights(){
@@ -425,28 +426,54 @@
       
       // add shadow plane under the car object
       function addCarShadow(){
-         // Texture
+        // Texture
 
-         // Plane
-         const shadowPlane = new THREE.PlaneBufferGeometry(5000, 5000,1,1);
-         shadowPlane.rotateX(-Math.PI / 2);
-         
- 
-         // Material
-         shadowMaterial = new THREE.MeshLambertMaterial({
-             map: shadowTexture,
-             transparent: true,
-             opacity:0.5,
-         });
- 
-         // Mesh
-         const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
-         shadowMesh.position.y = 1;
-         shadowMesh.position.z = 50;
-         shadowMesh.rotation.y = Math.PI / 2;
-         shadowMesh.receiveShadow = true;
-         scene.add(shadowMesh);
+        // Plane
+        const shadowPlane = new THREE.PlaneBufferGeometry(1200, 1200);
+        shadowPlane.rotateX(-Math.PI / 2);    
+
+        // Material
+        shadowMaterial = new THREE.MeshLambertMaterial({
+            map: shadowTexture,
+            transparent: true,
+            opacity:0.8,
+        });
+
+
+        // Mesh
+        const shadowMesh = new THREE.Mesh(shadowPlane, shadowMaterial);
+        shadowMesh.position.y = 2;
+        shadowMesh.position.z = 50;
+        shadowMesh.rotation.y = Math.PI / 2;
+        shadowMesh.receiveShadow = true;
+
+        console.log(shadowMesh)
+        scene.add(shadowMesh);
         //  console.log(shadowMesh)
+      }
+
+      function addGroundTexture(){
+        // Texture
+
+        // Plane
+        const groundPlane = new THREE.PlaneBufferGeometry(5000, 5000,1,1);
+        groundPlane.rotateX(-Math.PI / 2);
+
+        // Material
+        groundMaterial = new THREE.MeshLambertMaterial({
+            map: groundTexture,
+            transparent: true,
+            opacity:0.5,
+        });
+
+        // Mesh
+        const groundMesh = new THREE.Mesh(groundPlane, groundMaterial);
+        groundMesh.position.y = 1;
+        groundMesh.position.z = 50;
+        groundMesh.rotation.y = Math.PI / 2;
+        groundMesh.receiveShadow = true;
+        scene.add(groundMesh);
+       //  console.log(groundMesh)
       }
 
       // set scene background
@@ -482,7 +509,6 @@
         })
       }
 
-      
       // add listener to elements
       function add_eventListener(){
         // console.log("listeners added")
@@ -543,6 +569,7 @@
         colorTo(body,setting.color[this.dataset.color_name]);
         
       }
+      
       // change material color with a transition
       function colorTo(meshBody, newColor) {
         let target = meshBody
@@ -566,7 +593,6 @@
         });
       }
 
-
       // update camera position
       function change_view(view_name){
         switch(view_name) {
@@ -589,6 +615,7 @@
             // console.log("free view")
         }
       }
+
       function updateCameraPositon(position, _options) {
         const gsap = require("gsap").gsap;
         const x = position.x;
@@ -620,57 +647,5 @@
 
 
       }
-      //19 
-      // var fShader = "precision highp float;\n\n#define COUNT 20.0\n#define MAX_SCALE 3.0\n\nuniform sampler2D led;\n\nvarying vec2 vUv;\nvarying vec2 vOrigin;\n\nfloat normFloat(float n, float minVal, float maxVal){\n\treturn max(0.0, min(1.0, (n-minVal) / (maxVal-minVal)));\n}\n\nvoid main() {\n\t// Brightness fades away from center\n\tfloat brightness = distance(vUv, vec2(0.5));\n\tbrightness = normFloat(brightness, 0.5, 0.0);\n\n\t// Scale is a function of brightness [0 - 3.0]\n\tfloat scale = (brightness * brightness) * MAX_SCALE;\n\tfloat invScale = (1.0 / scale);\n\tfloat halfInvScale = (invScale - 1.0) / 2.0;\n\n\t// Multiply for count, abs(-0.5) for zig-zag\n\tvec2 newUV = abs(fract((vUv + vOrigin) * COUNT) - 0.5) * 2.0;\n\n\t// Scale up and clamp edges for padding\n\tnewUV = clamp((newUV * invScale) - halfInvScale, 0.0, 1.0);\n\n\tfloat texColor = texture2D(led, newUV).a * 0.15 * brightness;\n\tgl_FragColor = 1.0 - vec4(texColor, texColor, texColor, 0.0);\n}\n"
-      //20
-      // var vShader = "precision highp float;\n\nfloat normFloat(float n, float minVal, float maxVal){\n\treturn max(0.0, min(1.0, (n-minVal) / (maxVal-minVal)));\n}\n\nuniform vec3 cameraPosition;\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\nuniform vec2 origin;\n\nattribute vec2 uv;\nattribute vec3 position;\n\nvarying vec2 vUv;\nvarying vec2 vOrigin;\n\nvoid main() {\n\tvUv = uv;\n\tvOrigin = origin * 0.1;\n \tvec4 realPos = modelMatrix * vec4(position, 1.0);\n\n\tgl_Position = projectionMatrix * viewMatrix * realPos;\n}"
-      // function Grid(scene) {
-      //   var mouseActual = new THREE.Vector2(-0.2, 0.3);
-      //   var mouseTarget = new THREE.Vector2(THREE.Math.randInt(-40, 40), THREE.Math.randInt(-40, 40));
-      //   var tempVec = new THREE.Vector2();
-      //   // Define material
-      //   var sprite = new THREE.TextureLoader().load("dist/textures/led.png");
-      //   var shaderMat = new THREE.RawShaderMaterial({
-      //       uniforms: {
-      //           color: { value: new THREE.Color(0xffffff) },
-      //           texture: { value: sprite },
-      //           vpH: { value: window.innerHeight },
-      //           time: { value: 0 },
-      //           mousePos: { value:  mouseActual },
-      //           playhead: { value: 0 }
-      //       },
-      //       vertexShader: vShader,
-      //       fragmentShader: fShader,
-      //       blending: THREE.AdditiveBlending,
-      //       transparent: true,
-      //       depthTest: false
-      //   });
-      //   var uniformVPH = shaderMat.uniforms.vpH;
-      //   var uniformTime =  shaderMat.uniforms.time;
-      //   var uniformMouse = shaderMat.uniforms.mousePos;
-      //   var uniformPlay =  shaderMat.uniforms.playhead;
-      //   // Define buffergeometry
-      //   var i3 = 0;
-      //   var width = 1000;
-      //   var height = 1000;
-      //   var vertCount = width * height;
-      //   var bufferGeom = new THREE.BufferGeometry();
-      //   var allPos = new Float32Array(vertCount * 3);
-      //   for (var x = 0; x < width; x++) {
-      //       for (var y = 0; y < height; y++, i3 += 3) {
-      //           allPos[i3 + 0] = (x - Math.round(width / 2));
-      //           allPos[i3 + 1] = (y - Math.round(height / 2));
-      //           //  allPos[i3 + 2] = 0;
-      //       }
-      //   }
-      //   bufferGeom.setAttribute("position", new THREE.BufferAttribute(allPos, 3));
-      //   var pointsObject = new THREE.Points(bufferGeom, shaderMat);
-      //   // pointsObject.scale.set(0.125, 0.125, 0.125);
-      //   // pointsObject.position.z = -0.5;
-      //   pointsObject.position.y = 100;
-      //   pointsObject.position.z = 50;
-      //   // pointsObject.rotation.y = Math.PI / 2;
-      //   scene.add(pointsObject);
-      // }
 
 
