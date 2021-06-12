@@ -1,1 +1,1 @@
-# Toyota Corolla 2020 configurator
+Toyota Corolla 2020 configurator
